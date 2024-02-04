@@ -8,8 +8,6 @@ import java.io.Serializable
     tableName = "articles"
 )
 data class Article(
-    @PrimaryKey(autoGenerate = true)
-    var id: Int? = null,
     val author: String?,
     val content: String?,
     val description: String?,
@@ -17,5 +15,7 @@ data class Article(
     val source: Source?,
     val title: String?,
     val url: String,
-    val urlToImage: String?
+    val urlToImage: String?,
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null
 ) : Serializable

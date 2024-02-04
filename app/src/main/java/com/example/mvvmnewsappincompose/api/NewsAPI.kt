@@ -16,7 +16,7 @@ interface NewsAPI {
         pageNumber :  Int = 1,
         @Query("apiKey")
         apiKey: String = API_KEY
-    ): Response<NewsResponse>
+    ): NewsResponse
 
     @GET("v2/everything")
     suspend fun searchForNews(
@@ -26,6 +26,6 @@ interface NewsAPI {
         pageNumber :  Int = 1,
         @Query("apiKey")
         apiKey: String = API_KEY
-    ): Response<NewsResponse>
+    ): NewsResponse
 
 }

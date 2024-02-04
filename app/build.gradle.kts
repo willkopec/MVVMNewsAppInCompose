@@ -20,6 +20,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
     }
 
     buildTypes {
@@ -81,9 +83,12 @@ dependencies {
     //Dagger - Hilt
     implementation ("com.google.dagger:hilt-android:2.41")
     kapt ("com.google.dagger:hilt-android-compiler:2.41")
-    implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    //implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     kapt ("androidx.hilt:hilt-compiler:1.0.0-beta01")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+
+    //Timber
+    implementation ("com.jakewharton.timber:timber:4.7.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -9,34 +9,133 @@ import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
 import android.net.NetworkCapabilities.TRANSPORT_WIFI
 import android.os.Build
 import android.provider.ContactsContract.CommonDataKinds.Email.TYPE_MOBILE
+import android.util.Log
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mvvmnewsappincompose.NewsApplication
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.models.NewsResponse
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
 import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class BreakingNewsViewModel @Inject constructor(
-    private val newsRepository: NewsRepository
+    val newsRepository : NewsRepository
 ) : ViewModel() {
 
+    var isLoading = mutableStateOf(true)
+    var loadError = mutableStateOf("")
+    var endReached = mutableStateOf(false)
+    var breakingNews = mutableStateOf<List<Article>>(listOf())
+    private var breakingNewsPage = 1
 
-    val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
+    init {
+        getBreakingNews("us")
+    }
+
+    fun getBreakingNews(countryCode: String) = viewModelScope.launch {
+        viewModelScope.launch {
+            //isLoading.value = true
+            //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
+            var result = newsRepository.getBreakingNews("us", breakingNewsPage)
+            when(result) {
+                is Resource.Success -> {
+                    var curList : List<Article> = listOf()
+                    isLoading.value = true
+                    val breakingNewsArticles = result.data?.articles!!.mapIndexed { index, article ->
+                        Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
+                    }
+                    breakingNews.value += breakingNewsArticles
+                }
+                is Resource.Error -> {
+                    //loadError.value = result.message!!
+                    //isLoading.value = false
+
+                }
+
+                else -> {}
+            }
+
+        }
+
+        //safeBreakingNewsCall(countryCode)
+    }
+
+    private fun hasInternetConnection(): Boolean {
+        /*val connectivityManager = getApplication<NewsApplication>().getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            return when{
+                capabilities.hasTransport(TRANSPORT_WIFI) -> true
+                capabilities.hasTransport(TRANSPORT_CELLULAR) -> true
+                capabilities.hasTransport(TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.activeNetworkInfo?.run {
+                return when(type) {
+                    TYPE_WIFI -> true
+                    TYPE_MOBILE -> true
+                    TYPE_ETHERNET -> true
+                    else -> false
+                }
+            }
+        }*/
+        return true
+
+    }
+
+
+
+    /*private fun handleBreakingNewsResponse(response: Response<NewsResponse>) : Resource<NewsResponse> {
+        if(response.isSuccessful) {
+            response.body()?.let {resultResponse ->
+                breakingNewsPage++
+                if(breakingNewsResponse == null){
+                    breakingNewsResponse = resultResponse
+                } else {
+                    val oldArticles = breakingNewsResponse?.articles
+                    val newArticles = resultResponse.articles
+                    oldArticles?.addAll(newArticles)
+                }
+                return Resource.Success(breakingNewsResponse ?: resultResponse)
+            }
+        }
+
+        return Resource.Error(response.message())
+
+    }*/
+
+}
+
+    /*val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
     var breakingNewsPage = 1
     var breakingNewsResponse: NewsResponse? = null
 
     val searchNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
     var searchNewsPage = 1
-    var searchNewsResponse: NewsResponse? = null
+    var searchNewsResponse: NewsResponse? = null*/
+
+    /*var breakingNews = mutableStateOf(MutableLiveData<Resource<NewsResponse>>())
+    var breakingNewsPage = mutableIntStateOf(1)
+    var breakingNewsResponse = mutableStateOf(null)
 
     init {
         getBreakingNews("us")
@@ -102,8 +201,7 @@ class BreakingNewsViewModel @Inject constructor(
     private suspend fun safeSearchNewsCall(searchQuery: String){
         searchNews.postValue(Resource.Loading())
         try{
-            if(/*hasInternetConnection()*/
-            true){
+            if(hasInternetConnection()){
                 val response = newsRepository.searchNews(searchQuery, searchNewsPage)
                 searchNews.postValue(handleSearchNewsResponse(response))
             } else {
@@ -120,8 +218,7 @@ class BreakingNewsViewModel @Inject constructor(
     private suspend fun safeBreakingNewsCall(countryCode: String){
         breakingNews.postValue(Resource.Loading())
         try{
-            if(/*hasInternetConnection()*/
-            true){
+            if(hasInternetConnection()){
                 val response = newsRepository.getBreakingNews(countryCode, breakingNewsPage)
                 breakingNews.postValue(handleBreakingNewsResponse(response))
             } else {
@@ -135,8 +232,8 @@ class BreakingNewsViewModel @Inject constructor(
         }
     }
 
-    /*private fun hasInternetConnection(): Boolean {
-        val connectivityManager = getApplication<NewsApplication>().getSystemService(
+    private fun hasInternetConnection(): Boolean {
+        /*val connectivityManager = getApplication<NewsApplication>().getSystemService(
             Context.CONNECTIVITY_SERVICE
         ) as ConnectivityManager
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -157,14 +254,7 @@ class BreakingNewsViewModel @Inject constructor(
                     else -> false
                 }
             }
-        }
-        return false
+        }*/
+        return true
 
     }*/
-
-    /*suspend fun getPokemonInfo(pokemonName: String): Resource<Pokemon> {
-        return repository.getPokemonInfo(pokemonName)
-    }*/
-
-
-}
