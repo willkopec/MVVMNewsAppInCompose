@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MVVMNewsAppInComposeTheme {
 
-                val navController = rememberNavController()
+                /*val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = "breaking_news_screen")
                 {
@@ -73,7 +73,9 @@ class MainActivity : ComponentActivity() {
                         BreakingNewsScreen(navController = navController)
                     }
 
-                }
+                }*/
+
+                RootNavigationGraph(navController = rememberNavController())
 
 
             }
