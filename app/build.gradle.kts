@@ -90,6 +90,12 @@ dependencies {
     //Timber
     implementation ("com.jakewharton.timber:timber:4.7.1")
 
+    // Coil
+    implementation ("io.coil-kt:coil:1.1.1")
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+    implementation("androidx.compose.ui:ui-tooling-preview")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

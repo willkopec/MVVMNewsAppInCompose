@@ -12,6 +12,7 @@ import android.provider.ContactsContract.CommonDataKinds.Email.TYPE_MOBILE
 import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -41,25 +42,28 @@ class BreakingNewsViewModel @Inject constructor(
     var loadError = mutableStateOf("")
     var endReached = mutableStateOf(false)
     var breakingNews = mutableStateOf<List<Article>>(listOf())
-    private var breakingNewsPage = 1
+    var breakingNewsPage = 1
 
     init {
         getBreakingNews("us")
     }
 
-    fun getBreakingNews(countryCode: String) = viewModelScope.launch {
+    fun getBreakingNews(countryCode: String) {
         viewModelScope.launch {
-            //isLoading.value = true
+            isLoading.value = true
             //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
             var result = newsRepository.getBreakingNews("us", breakingNewsPage)
+            Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news size: ${breakingNews.value.size}")
             when(result) {
                 is Resource.Success -> {
-                    var curList : List<Article> = listOf()
-                    isLoading.value = true
+
                     val breakingNewsArticles = result.data?.articles!!.mapIndexed { index, article ->
                         Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
                     }
+
+                    breakingNewsPage++
                     breakingNews.value += breakingNewsArticles
+
                 }
                 is Resource.Error -> {
                     //loadError.value = result.message!!
