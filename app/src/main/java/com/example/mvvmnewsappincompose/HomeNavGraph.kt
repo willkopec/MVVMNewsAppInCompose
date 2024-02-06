@@ -29,9 +29,13 @@ fun HomeNavGraph(navController: NavHostController) {
             )
         }
         composable(route = BottomBarScreen.Profile.route) {
-            ScreenContent(
+            /*ScreenContent(
                 name = BottomBarScreen.Profile.route,
                 onClick = { navController.navigate(Graph.DETAILS) }
+            )*/
+            SavedNewsScreen(
+                name = BottomBarScreen.Profile.route,
+                onClick = { }
             )
         }
         composable(route = BottomBarScreen.Settings.route) {

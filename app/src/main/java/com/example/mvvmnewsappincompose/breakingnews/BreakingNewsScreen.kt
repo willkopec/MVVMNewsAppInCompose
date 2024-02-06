@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mvvmnewsappincompose.BottomNavigationItem
@@ -64,76 +65,6 @@ fun BreakingNewsScreen(
     }
 
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BottomNavigation(
-    navContoller: NavController
-) {
-
-    val items = listOf(
-
-        BottomNavigationItem(
-            title = "Breaking News",
-            selectedIcon = ImageVector.vectorResource(R.drawable.ic_breaking_news),
-            unSelectedIcon = ImageVector.vectorResource(R.drawable.ic_breaking_news),
-            hasNews = false
-        ),
-        BottomNavigationItem(
-            title = "Saved News",
-            selectedIcon = ImageVector.vectorResource(R.drawable.ic_favorite),
-            unSelectedIcon = ImageVector.vectorResource(R.drawable.ic_favorite),
-            hasNews = false,
-        ),
-        BottomNavigationItem(
-            title = "Search News",
-            selectedIcon = ImageVector.vectorResource(R.drawable.ic_all_news),
-            unSelectedIcon = ImageVector.vectorResource(R.drawable.ic_all_news),
-            hasNews = false,
-        ),
-
-        )
-
-    var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
-
-            NavigationBar {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItemIndex == index,
-                        onClick = {
-                            selectedItemIndex = index
-                        },
-                        label = {
-                            Text(text = item.title)
-                        },
-                        icon = {
-                            BadgedBox(
-                                badge = {
-                                    if(item.badgeCount != null) {
-                                        Badge {
-                                            Text(text = item.badgeCount.toString())
-                                        }
-                                    } else if(item.hasNews) {
-                                        Badge()
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = if(index == selectedItemIndex){
-                                        item.selectedIcon
-                                    } else item.unSelectedIcon,
-                                    contentDescription = item.title
-                                )
-                            }
-                        })
-                }
-            }
-        }
-
-
-
 
 @Composable
 fun BreakingNewsListScreen(
