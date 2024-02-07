@@ -1,9 +1,12 @@
 package com.example.mvvmnewsappincompose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 
 @Composable
 fun RootNavigationGraph(navController: NavHostController) {

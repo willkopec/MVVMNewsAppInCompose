@@ -1,10 +1,14 @@
 package com.example.mvvmnewsappincompose
 
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 import androidx.navigation.navigation
 import com.example.mvvmnewsappincompose.breakingnews.BreakingNewsScreen
 
@@ -13,37 +17,56 @@ fun HomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.HOME,
-        startDestination = BottomBarScreen.Home.route
+        startDestination = BottomBarScreen.BreakingNews.route
     ) {
-        composable(route = BottomBarScreen.Home.route) {
-            //BreakingNewsScreen(name = BottomBarScreen.Home.route, onClick = { navController.navigate(Graph.DETAILS) })
-            /*ScreenContent(
-                name = BottomBarScreen.Home.route,
-                onClick = {
-                    navController.navigate(Graph.DETAILS)
-                }
-            )*/
+        composable(route = BottomBarScreen.BreakingNews.route) {
             BreakingNewsScreen(
-                name = BottomBarScreen.Home.route,
+                navController,
+                name = BottomBarScreen.BreakingNews.route,
                 onClick = { /*TODO*/ }
             )
         }
-        composable(route = BottomBarScreen.Profile.route) {
+        composable(route = BottomBarScreen.SavedNews.route) {
             /*ScreenContent(
                 name = BottomBarScreen.Profile.route,
                 onClick = { navController.navigate(Graph.DETAILS) }
             )*/
             SavedNewsScreen(
-                name = BottomBarScreen.Profile.route,
+                name = BottomBarScreen.SavedNews.route,
                 onClick = { }
             )
+            //WebViewScreen("https://www.google.com")
         }
-        composable(route = BottomBarScreen.Settings.route) {
+        composable(route = BottomBarScreen.SearchNews.route) {
             ScreenContent(
-                name = BottomBarScreen.Settings.route,
+                name = BottomBarScreen.SearchNews.route,
                 onClick = { }
             )
         }
+
+        composable(route = "saved_news/{articleUrl}",
+            arguments = listOf(
+                navArgument("articleUrl") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val articleUrl = remember {
+                it.arguments?.getString("articleUrl")
+            }
+            //WebViewScreen("https://www.google.com")
+            /*val articleUrl = remember {
+                it.arguments?.getString("articleUrl")
+            }
+            Log.d("Saved News WebView Navigation", "HomeNavGraph: ${articleUrl}")
+            if (articleUrl != null) {*/
+
+            if (articleUrl != null) {
+                WebViewScreen(articleUrl)
+            }
+            //}
+        }
+
         detailsNavGraph(navController = navController)
     }
 }

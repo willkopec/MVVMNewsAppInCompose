@@ -46,18 +46,6 @@ data class BottomNavigationItem(
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    /*private val viewModel by viewModels<BreakingNewsViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                    return BreakingNewsViewModel() as T
-                }
-            }
-        }
-    )*/
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

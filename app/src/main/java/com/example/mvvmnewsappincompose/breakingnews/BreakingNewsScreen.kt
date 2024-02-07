@@ -1,5 +1,7 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,15 +45,20 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mvvmnewsappincompose.BottomNavigationItem
 import com.example.mvvmnewsappincompose.R
 import com.example.mvvmnewsappincompose.models.Article
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 @Composable
 fun BreakingNewsScreen(
+    navController: NavController,
     name: String,
     onClick: () -> Unit
 ) {
@@ -60,7 +67,7 @@ fun BreakingNewsScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         //BottomNavigation(navController)
-        BreakingNewsListScreen()
+        BreakingNewsListScreen(navController)
         //BottomNavigation()
     }
 
@@ -68,13 +75,18 @@ fun BreakingNewsScreen(
 
 @Composable
 fun BreakingNewsListScreen(
+    navController: NavController,
     viewModel: BreakingNewsViewModel = hiltViewModel()
 ) {
 
     val breakingNewsList by remember {  viewModel.breakingNews  }
 
 
-    LazyColumn(contentPadding = PaddingValues(16.dp)) {
+    LazyColumn(contentPadding = PaddingValues(
+        16.dp,
+        bottom = 100.dp
+    ))
+    {
 
         val itemCount = breakingNewsList.size
 
@@ -87,6 +99,7 @@ fun BreakingNewsListScreen(
 
             }
             NewsArticleEntry(
+                navController,
                 rowIndex = it,
                 entry = breakingNewsList,
                 modifier = Modifier
@@ -101,143 +114,78 @@ fun BreakingNewsListScreen(
 
 @Composable
 fun NewsArticleEntry(
+    navController: NavController,
     rowIndex: Int,
     entry: List<Article>,
     modifier: Modifier = Modifier,
     viewModel: BreakingNewsViewModel = hiltViewModel()
-    ) {
-        Column {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .shadow(5.dp, RoundedCornerShape(10.dp))
-                    .padding(13.dp)
-                /*.clickable {
+) {
 
-                }*/
+    Column {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .shadow(5.dp, RoundedCornerShape(10.dp))
+                .padding(13.dp)
+                .clickable {
+                    //
+                    val encodedUrl = URLEncoder.encode(entry[rowIndex].url, StandardCharsets.UTF_8.toString())
+                    navController.navigate(
+                        "saved_news/$encodedUrl"
+                    )
+                }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.3f)
+                    .align(Alignment.TopStart)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .align(Alignment.TopStart)
-                ) {
-                    Column {
-                        SubcomposeAsyncImage(
-                            model = entry[rowIndex].urlToImage,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            loading = {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.scale(0.5f)
-                                )
-                            }
-                        )
-                    }
-
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .align(Alignment.TopEnd)
-                ) {
-                    Column {
-                            entry[rowIndex].title?.let { it1 ->
-                                Text(
-                                    text = it1,
-                                    fontSize = 11.sp,
-                                    fontWeight = Bold,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-
-                        entry[rowIndex].description?.let { it1 ->
-                            Text(
-                                text = it1,
-                                fontSize = 9.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                    }
-
-                }
-
-                /*Row {
-
-                    Column {
-                        it.title?.let { it1 ->
-                            Text(
-                                text = it1,
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            )
-                        }
-                        SubcomposeAsyncImage(
-                            model = it.urlToImage,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(350.dp)
-                                .align(Alignment.Start),
-                            loading = {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.scale(0.5f)
-                                )
-                            }
-                        )
-                        Column {
-                            it.description?.let { it1 ->
-                                Text(
-                                    text = it1,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-
-                        }
-
-                    }
-
-
-
-                }*/
-
-                /*Column {
-
+                Column {
                     SubcomposeAsyncImage(
-                        model = it.urlToImage,
+                        model = entry[rowIndex].urlToImage,
                         contentDescription = null,
                         modifier = Modifier
-                            .size(200.dp)
-                            .align(Alignment.Start),
+                            .fillMaxWidth(),
                         loading = {
                             CircularProgressIndicator(
                                 modifier = Modifier.scale(0.5f)
                             )
                         }
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Row{
-                        it.description?.let { it1 ->
-                            Text(
-                                text = it1,
-                                fontSize = 12.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
-
-                }*/
+                }
 
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.TopEnd)
+            ) {
+                Column {
+                    entry[rowIndex].title?.let { it1 ->
+                        Text(
+                            text = it1,
+                            fontSize = 11.sp,
+                            fontWeight = Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    entry[rowIndex].description?.let { it1 ->
+                        Text(
+                            text = it1,
+                            fontSize = 9.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                }
+
+            }
+
         }
+    }
 }

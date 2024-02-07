@@ -2,7 +2,6 @@ package com.example.mvvmnewsappincompose
 
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -19,8 +18,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -31,9 +28,10 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun HomeScreen(navController: NavHostController = rememberNavController()) {
     Scaffold(
-        bottomBar = { BottomNavigation(navController) }
+        bottomBar = { BottomNavigation(navController) },
     ) {
         HomeNavGraph(navController = navController)
+
     }
 }
 
@@ -67,9 +65,9 @@ fun BottomNavigation(
         )
 
     val screens = listOf(
-        BottomBarScreen.Home,
-        BottomBarScreen.Profile,
-        BottomBarScreen.Settings,
+        BottomBarScreen.BreakingNews,
+        BottomBarScreen.SavedNews,
+        BottomBarScreen.SearchNews,
     )
 
     var selectedItemIndex by rememberSaveable {
@@ -79,43 +77,47 @@ fun BottomNavigation(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-
-    NavigationBar {
-        items.forEachIndexed { index, item ->
-            NavigationBarItem(
-                /*selected = selectedItemIndex == index,*/
-                selected = currentDestination?.hierarchy?.any {
-                    it.route == screens[index].route
-                } == true,
-                onClick = {
-                    navController.navigate(screens[index].route) {
-                        popUpTo(navController.graph.findStartDestination().id)
-                        launchSingleTop = true
-                    }
-                },
-                label = {
-                    Text(text = item.title)
-                },
-                icon = {
-                    BadgedBox(
-                        badge = {
-                            if(item.badgeCount != null) {
-                                Badge {
-                                    Text(text = item.badgeCount.toString())
-                                }
-                            } else if(item.hasNews) {
-                                Badge()
-                            }
+    val bottomBarDestination = screens.any { it.route == currentDestination?.route }
+    if(bottomBarDestination){
+        NavigationBar {
+            items.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    /*selected = selectedItemIndex == index,*/
+                    selected = currentDestination?.hierarchy?.any {
+                        it.route == screens[index].route
+                    } == true,
+                    onClick = {
+                        navController.navigate(screens[index].route) {
+                            popUpTo(navController.graph.findStartDestination().id)
+                            launchSingleTop = true
                         }
-                    ) {
-                        Icon(
-                            imageVector = if(index == selectedItemIndex){
-                                item.selectedIcon
-                            } else item.unSelectedIcon,
-                            contentDescription = item.title
-                        )
-                    }
-                })
+                    },
+                    label = {
+                        Text(text = item.title)
+                    },
+                    icon = {
+                        BadgedBox(
+                            badge = {
+                                if(item.badgeCount != null) {
+                                    Badge {
+                                        Text(text = item.badgeCount.toString())
+                                    }
+                                } else if(item.hasNews) {
+                                    Badge()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if(index == selectedItemIndex){
+                                    item.selectedIcon
+                                } else item.unSelectedIcon,
+                                contentDescription = item.title
+                            )
+                        }
+                    })
+            }
         }
     }
+
+
 }

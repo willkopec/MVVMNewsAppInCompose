@@ -11,19 +11,19 @@ sealed class BottomBarScreen(
     val title: String,
     val icon: ImageVector
 ) {
-    object Home : BottomBarScreen(
+    object BreakingNews : BottomBarScreen(
         route = "home",
         title = "Home",
         icon = Icons.Default.Home
     )
 
-    object Profile : BottomBarScreen(
+    object SavedNews : BottomBarScreen(
         route = "profile",
         title = "Profile",
         icon = Icons.Default.Person
     )
 
-    object Settings : BottomBarScreen(
+    object SearchNews : BottomBarScreen(
         route = "settings",
         title = "Settings",
         icon = Icons.Default.Settings
