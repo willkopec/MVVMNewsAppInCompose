@@ -6,14 +6,22 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
-@SuppressLint("SetJavaScriptEnabled")
+@SuppressLint("SetJavaScriptEnabled", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun WebViewScreen(url: String){
 
@@ -22,37 +30,51 @@ fun WebViewScreen(url: String){
 
     // Adding a WebView inside AndroidView
     // with layout as full screen
-    AndroidView(
-        factory = {
-            WebView(it).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                webViewClient = WebViewClient()
+    Scaffold(
+        topBar = {},
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {},
+                modifier = Modifier.size(50.dp)
+            ) {
+                Icon(Icons.Filled.Add,"")
+            }
+        }
+    ) {
 
-                // to play video on a web view
-                settings.javaScriptEnabled = true
+        AndroidView(
+            factory = {
+                WebView(it).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    webViewClient = WebViewClient()
 
-                webViewClient = object : WebViewClient() {
+                    // to play video on a web view
+                    settings.javaScriptEnabled = true
 
-                    override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
-                        backEnabled = view.canGoBack()
+                    webViewClient = object : WebViewClient() {
+
+                        override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+                            backEnabled = view.canGoBack()
+                        }
+
                     }
 
+                    loadUrl(url)
+                    webView = this
                 }
-
-                loadUrl(url)
-                webView = this
-            }
-        }, update = {
-            webView = it
-            //  it.loadUrl(url)
-        })
+            }, update = {
+                webView = it
+                //  it.loadUrl(url)
+            })
 
 
-    BackHandler(enabled = backEnabled) {
-        webView?.goBack()
+        BackHandler(enabled = backEnabled) {
+            webView?.goBack()
+        }
+
     }
 
 }
