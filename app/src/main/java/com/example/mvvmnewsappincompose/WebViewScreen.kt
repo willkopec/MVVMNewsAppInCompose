@@ -9,6 +9,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -25,7 +26,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 @Composable
 fun WebViewScreen(url: String){
 
-    var backEnabled by remember { mutableStateOf(false) }
+    var backEnabled by remember { mutableStateOf(true) }
     var webView: WebView? = null
 
     // Adding a WebView inside AndroidView

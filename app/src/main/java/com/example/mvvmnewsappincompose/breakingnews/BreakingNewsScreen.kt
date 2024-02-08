@@ -158,19 +158,30 @@ fun NewsArticleEntry(
 
             }
 
-            Row(
-                modifier = Modifier
+            val modifierForText: Modifier
+
+            if(entry[rowIndex].urlToImage == null){
+                modifierForText = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.Center)
+            } else {
+                modifierForText = Modifier
                     .fillMaxWidth(0.7f)
                     .align(Alignment.TopEnd)
+            }
+
+            Row(
+                modifier = modifierForText
             ) {
                 Column {
+
                     if(entry[rowIndex].title != "[Removed]"){
                         entry[rowIndex].title?.let { it1 ->
                             Text(
                                 text = it1,
-                                fontSize = 11.sp,
+                                fontSize = 12.sp,
                                 fontWeight = Bold,
-                                lineHeight = 14.sp,
+                                lineHeight = 15.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
                                 maxLines = 2
@@ -181,9 +192,9 @@ fun NewsArticleEntry(
                             entry[rowIndex].description?.let { it1 ->
                                 Text(
                                     text = it1,
-                                    fontSize = 9.sp,
+                                    fontSize = 10.sp,
                                     textAlign = TextAlign.Center,
-                                    lineHeight = 11.sp,
+                                    lineHeight = 12.sp,
                                     modifier = Modifier.fillMaxWidth(),
                                     maxLines = 4
                                 )
