@@ -2,11 +2,13 @@ package com.example.mvvmnewsappincompose.breakingnews
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -83,7 +85,7 @@ fun BreakingNewsListScreen(
 
 
     LazyColumn(contentPadding = PaddingValues(
-        16.dp,
+        //16.dp,
         bottom = 100.dp
     ))
     {
@@ -123,11 +125,10 @@ fun NewsArticleEntry(
 
     Column {
         Box(
-            contentAlignment = Alignment.Center,
             modifier = modifier
                 .fillMaxWidth()
-                .shadow(5.dp, RoundedCornerShape(10.dp))
-                .padding(13.dp)
+                .shadow(1.dp, RoundedCornerShape(1.dp))
+                /*.padding(13.dp)*/
                 .clickable {
                     //
                     val encodedUrl = URLEncoder.encode(entry[rowIndex].url, StandardCharsets.UTF_8.toString())
@@ -139,14 +140,14 @@ fun NewsArticleEntry(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(0.3f)
-                    .align(Alignment.TopStart)
+                    /*.align(Alignment.TopStart)*/
             ) {
                 Column {
                     SubcomposeAsyncImage(
                         model = entry[rowIndex].urlToImage,
                         contentDescription = null,
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxHeight(),
                         loading = {
                             CircularProgressIndicator(
                                 modifier = Modifier.scale(0.5f)
@@ -163,24 +164,45 @@ fun NewsArticleEntry(
                     .align(Alignment.TopEnd)
             ) {
                 Column {
-                    entry[rowIndex].title?.let { it1 ->
-                        Text(
-                            text = it1,
-                            fontSize = 11.sp,
-                            fontWeight = Bold,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                    if(entry[rowIndex].title != "[Removed]"){
+                        entry[rowIndex].title?.let { it1 ->
+                            Text(
+                                text = it1,
+                                fontSize = 11.sp,
+                                fontWeight = Bold,
+                                lineHeight = 14.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                                maxLines = 2
+                            )
+                        }
+
+                        if(entry[rowIndex].description != null){
+                            entry[rowIndex].description?.let { it1 ->
+                                Text(
+                                    text = it1,
+                                    fontSize = 9.sp,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 11.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    maxLines = 4
+                                )
+                            }
+                        } else {
+                            entry[rowIndex].title?.let { it1 ->
+                                Text(
+                                    text = it1,
+                                    fontSize = 9.sp,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 11.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    maxLines = 4
+                                )
+                            }
+                        }
+
                     }
 
-                    entry[rowIndex].description?.let { it1 ->
-                        Text(
-                            text = it1,
-                            fontSize = 9.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
 
                 }
 
