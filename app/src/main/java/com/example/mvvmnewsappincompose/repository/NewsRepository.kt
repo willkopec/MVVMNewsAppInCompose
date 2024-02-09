@@ -1,6 +1,7 @@
 package com.example.mvvmnewsappincompose.repository
 
 import com.example.mvvmnewsappincompose.api.RetrofitInstance
+import com.example.mvvmnewsappincompose.db.ArticleDao
 import com.example.mvvmnewsappincompose.db.ArticleDatabase
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.models.NewsResponse
@@ -9,6 +10,7 @@ import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 class NewsRepository @Inject constructor(
+    val dao: ArticleDao
 ) {
     suspend fun getBreakingNews(countryCode: String, pageNumber: Int) : Resource<NewsResponse> {
         val response = try {
@@ -19,9 +21,11 @@ class NewsRepository @Inject constructor(
         return Resource.Success(response)
     }
 
+    suspend fun upsert(article: Article) = dao.upsert(article)
 
-    suspend fun searchNews(searchQuery: String, pageNumber: Int) =
-        RetrofitInstance.api.searchForNews(searchQuery, pageNumber)
+
+    /*suspend fun searchNews(searchQuery: String, pageNumber: Int) =
+        RetrofitInstance.api.searchForNews(searchQuery, pageNumber)*/
 
     //suspend fun upsert(article: Article) = db.getArticleDao().upsert(article)
 

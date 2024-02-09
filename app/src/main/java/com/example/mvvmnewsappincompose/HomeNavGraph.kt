@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.mvvmnewsappincompose.breakingnews.BreakingNewsScreen
 
@@ -54,17 +54,12 @@ fun HomeNavGraph(navController: NavHostController) {
             val articleUrl = remember {
                 it.arguments?.getString("articleUrl")
             }
-            //WebViewScreen("https://www.google.com")
-            /*val articleUrl = remember {
-                it.arguments?.getString("articleUrl")
-            }
-            Log.d("Saved News WebView Navigation", "HomeNavGraph: ${articleUrl}")
-            if (articleUrl != null) {*/
 
+            //need to pass an "https://" link to not cause an error
             if (articleUrl != null) {
                 WebViewScreen(articleUrl)
             }
-            //}
+
         }
 
         detailsNavGraph(navController = navController)

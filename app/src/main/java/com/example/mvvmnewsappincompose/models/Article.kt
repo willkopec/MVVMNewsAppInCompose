@@ -7,6 +7,7 @@ import java.io.Serializable
 @Entity(
     tableName = "articles"
 )
+
 data class Article(
     val author: String?,
     val content: String?,
