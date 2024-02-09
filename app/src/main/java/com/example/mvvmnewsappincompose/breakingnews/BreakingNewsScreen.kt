@@ -113,13 +113,14 @@ fun NewsArticleEntry(
                 /*.padding(13.dp)*/
                 .clickable {
                     //
-                    val encodedUrl = URLEncoder.encode(entry[rowIndex].url, StandardCharsets.UTF_8.toString())
+                    /*val encodedUrl = URLEncoder.encode(entry[rowIndex].url, StandardCharsets.UTF_8.toString())
+                    navController.navigate(
+                        "saved_news/$encodedUrl"
+                    )*/
+                    val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
                     navController.navigate(
                         "saved_news/$encodedUrl"
                     )
-                    /*navController.navigate(
-                        "saved_news/$currentArticle"
-                    )*/
                 }
         ) {
             Row(

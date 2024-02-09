@@ -21,10 +21,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mvvmnewsappincompose.breakingnews.NewsViewModel
+import com.example.mvvmnewsappincompose.models.Article
 
 @SuppressLint("SetJavaScriptEnabled", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun WebViewScreen(url: String){
+fun WebViewScreen(
+    article: Article,
+    viewModel: NewsViewModel = hiltViewModel()
+){
 
     var backEnabled by remember { mutableStateOf(true) }
     var webView: WebView? = null
@@ -35,7 +41,9 @@ fun WebViewScreen(url: String){
         topBar = {},
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = {
+                    viewModel.saveArticle(article)
+                },
                 modifier = Modifier.size(50.dp)
             ) {
                 Icon(Icons.Filled.Add,"")
@@ -63,7 +71,7 @@ fun WebViewScreen(url: String){
 
                     }
 
-                    loadUrl(url)
+                    loadUrl(article.url)
                     webView = this
                 }
             }, update = {

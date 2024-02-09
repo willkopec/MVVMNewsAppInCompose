@@ -11,6 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.mvvmnewsappincompose.breakingnews.BreakingNewsScreen
+import com.example.mvvmnewsappincompose.models.Article
+import com.squareup.moshi.Moshi
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
@@ -44,21 +48,35 @@ fun HomeNavGraph(navController: NavHostController) {
             )
         }
 
-        composable(route = "saved_news/{articleUrl}",
+        composable(route = "saved_news/{article}",
             arguments = listOf(
-                navArgument("articleUrl") {
+                navArgument("article") {
                     type = NavType.StringType
                 }
             )
-        ) {
-            val articleUrl = remember {
+        ) {backStackEntry ->
+
+            val articleJson = backStackEntry.arguments?.getString("article")
+            val moshi = Moshi.Builder().build()
+            val jsonAdapter = moshi.adapter(Article::class.java).lenient()
+            URLDecoder.decode(articleJson, "utf-8")
+
+            val currentArticle = jsonAdapter.fromJson(articleJson)
+            
+            //WebViewScreen(url = "https://www.google.com")
+            if (currentArticle != null) {
+                WebViewScreen(currentArticle)
+            }
+
+
+            /*val articleUrl = remember {
                 it.arguments?.getString("articleUrl")
             }
 
             //need to pass an "https://" link to not cause an error
             if (articleUrl != null) {
                 WebViewScreen(articleUrl)
-            }
+            }*/
 
         }
 
