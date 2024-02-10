@@ -35,23 +35,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MVVMNewsAppInComposeTheme {
-
-                /*val navController = rememberNavController()
-
-                NavHost(navController = navController, startDestination = "breaking_news_screen")
-                {
-
-                    composable("breaking_news_screen") {
-                        BreakingNewsScreen(navController = navController)
-                    }
-
-                }*/
-
                 RootNavigationGraph(navController = rememberNavController())
-
-
             }
         }
+
     }
 }
 
@@ -62,7 +49,6 @@ fun RootNavigationGraph(navController: NavHostController) {
         route = Graph.ROOT,
         startDestination = Graph.HOME
     ) {
-        //authNavGraph(navController = navController)
         composable(route = Graph.HOME) {
             HomeScreen()
         }

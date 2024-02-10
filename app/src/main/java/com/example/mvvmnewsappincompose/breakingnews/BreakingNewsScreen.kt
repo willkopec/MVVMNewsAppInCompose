@@ -1,6 +1,5 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,24 +32,12 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.mvvmnewsappincompose.models.Article
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-
 
 @Composable
-fun BreakingNewsScreen(
-    navController: NavController,
-    name: String,
-    onClick: () -> Unit
-) {
-    Surface(
-        color = Color.White,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        //BottomNavigation(navController)
+fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit) {
+    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
         BreakingNewsListScreen(navController)
-        //BottomNavigation()
     }
-
 }
 
 @Composable
@@ -59,22 +46,15 @@ fun BreakingNewsListScreen(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    val breakingNewsList by remember {  viewModel.breakingNews  }
+    val breakingNewsList by remember { viewModel.breakingNews }
 
-
-    LazyColumn(
-        contentPadding = PaddingValues(bottom = 100.dp)
-    ) {
-
+    LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
         val itemCount = breakingNewsList.size
 
         items(itemCount) {
-            if(it >= itemCount - 1) {
+            if (it >= itemCount - 1) {
 
-                LaunchedEffect(key1 = true){
-                    viewModel.getBreakingNews("us")
-                }
-
+                LaunchedEffect(key1 = true) { viewModel.getBreakingNews("us") }
             }
             NewsArticleEntry(
                 navController,
@@ -83,51 +63,29 @@ fun BreakingNewsListScreen(
                 modifier = Modifier
             )
         }
-
     }
-
-
 }
 
 @Composable
-fun SavedNewsListScreen(
-    navController: NavController,
-    viewModel: NewsViewModel = hiltViewModel()
-) {
+fun SavedNewsListScreen(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
 
+    val savedNews by remember { viewModel.savedNews }
 
-    val savedNews by remember {  viewModel.savedNews  }
-
-    LazyColumn(contentPadding = PaddingValues(
-        //16.dp,
-        bottom = 100.dp
-    ))
-    {
-
+    LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
 
         val itemCount = savedNews.size
-        viewModel.getSavedNews()
 
         items(itemCount) {
-            if(it >= itemCount - 1) {
+            //no need to paginate as savedNews already contains all of the saved news from the local database
+            /*if (it >= itemCount - 1) {
 
-                LaunchedEffect(key1 = true){
-                    viewModel.getSavedNews()
+                LaunchedEffect(key1 = true) {
+                    // viewModel.getSavedNews()
                 }
-
-            }
-            NewsArticleEntry(
-                navController,
-                rowIndex = it,
-                entry = savedNews,
-                modifier = Modifier
-            )
-            //BottomNavigation(navContoller)
+            }*/
+            NewsArticleEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
         }
-
     }
-
-
 }
 
 @Composable
@@ -139,68 +97,47 @@ fun NewsArticleEntry(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-
     val moshi = Moshi.Builder().build()
     val jsonAdapter = moshi.adapter(Article::class.java).lenient()
     val currentArticle = jsonAdapter.toJson(entry[rowIndex])
 
     Column {
         Box(
-            modifier = modifier
+            modifier =
+            modifier
                 .fillMaxWidth()
                 .shadow(1.dp, RoundedCornerShape(1.dp))
                 /*.padding(13.dp)*/
                 .clickable {
-                    //
-                    /*val encodedUrl = URLEncoder.encode(entry[rowIndex].url, StandardCharsets.UTF_8.toString())
-                    navController.navigate(
-                        "saved_news/$encodedUrl"
-                    )*/
                     val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
-                    navController.navigate(
-                        "saved_news/$encodedUrl"
-                    )
+                    navController.navigate("saved_news/$encodedUrl")
                 }
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.3f)
-                    /*.align(Alignment.TopStart)*/
+                modifier = Modifier.fillMaxWidth(0.3f)
+                /*.align(Alignment.TopStart)*/
             ) {
                 Column {
                     SubcomposeAsyncImage(
                         model = entry[rowIndex].urlToImage,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxHeight(),
-                        loading = {
-                            CircularProgressIndicator(
-                                modifier = Modifier.scale(0.5f)
-                            )
-                        }
+                        modifier = Modifier.fillMaxHeight(),
+                        loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
                     )
                 }
-
             }
 
             val modifierForText: Modifier
 
-            if(entry[rowIndex].urlToImage == null){
-                modifierForText = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
+            if (entry[rowIndex].urlToImage == null) {
+                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.Center)
             } else {
-                modifierForText = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.TopEnd)
+                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.TopEnd)
             }
 
-            Row(
-                modifier = modifierForText
-            ) {
+            Row(modifier = modifierForText) {
                 Column {
-
-                    if(entry[rowIndex].title != "[Removed]"){
+                    if (entry[rowIndex].title != "[Removed]") {
                         entry[rowIndex].title?.let { it1 ->
                             Text(
                                 text = it1,
@@ -213,7 +150,7 @@ fun NewsArticleEntry(
                             )
                         }
 
-                        if(entry[rowIndex].description != null){
+                        if (entry[rowIndex].description != null) {
                             entry[rowIndex].description?.let { it1 ->
                                 Text(
                                     text = it1,
@@ -236,14 +173,9 @@ fun NewsArticleEntry(
                                 )
                             }
                         }
-
                     }
-
-
                 }
-
             }
-
         }
     }
 }

@@ -15,10 +15,12 @@ fun SavedNewsScreen(
     name: String,
     onClick: () -> Unit
 ) {
+
     Surface(
         color = Color.White,
         modifier = Modifier.fillMaxSize()
     ) {
         SavedNewsListScreen(navController)
     }
+
 }
