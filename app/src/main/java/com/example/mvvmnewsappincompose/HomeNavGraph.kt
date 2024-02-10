@@ -37,6 +37,7 @@ fun HomeNavGraph(navController: NavHostController) {
             )*/
             SavedNewsScreen(
                 name = BottomBarScreen.SavedNews.route,
+                navController = navController,
                 onClick = { }
             )
             //WebViewScreen("https://www.google.com")

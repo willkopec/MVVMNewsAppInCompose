@@ -2,6 +2,7 @@ package com.example.mvvmnewsappincompose
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -43,10 +44,12 @@ fun WebViewScreen(
             FloatingActionButton(
                 onClick = {
                     viewModel.saveArticle(article)
+                    Log.d("WebViewScreen", "WebViewScreen: CLICKED HERE")
                 },
                 modifier = Modifier.size(50.dp)
             ) {
                 Icon(Icons.Filled.Add,"")
+
             }
         }
     ) {

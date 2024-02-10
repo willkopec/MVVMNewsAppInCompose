@@ -1,5 +1,6 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,11 +62,9 @@ fun BreakingNewsListScreen(
     val breakingNewsList by remember {  viewModel.breakingNews  }
 
 
-    LazyColumn(contentPadding = PaddingValues(
-        //16.dp,
-        bottom = 100.dp
-    ))
-    {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = 100.dp)
+    ) {
 
         val itemCount = breakingNewsList.size
 
@@ -81,6 +80,46 @@ fun BreakingNewsListScreen(
                 navController,
                 rowIndex = it,
                 entry = breakingNewsList,
+                modifier = Modifier
+            )
+        }
+
+    }
+
+
+}
+
+@Composable
+fun SavedNewsListScreen(
+    navController: NavController,
+    viewModel: NewsViewModel = hiltViewModel()
+) {
+
+
+    val savedNews by remember {  viewModel.savedNews  }
+
+    LazyColumn(contentPadding = PaddingValues(
+        //16.dp,
+        bottom = 100.dp
+    ))
+    {
+
+
+        val itemCount = savedNews.size
+        viewModel.getSavedNews()
+
+        items(itemCount) {
+            if(it >= itemCount - 1) {
+
+                LaunchedEffect(key1 = true){
+                    viewModel.getSavedNews()
+                }
+
+            }
+            NewsArticleEntry(
+                navController,
+                rowIndex = it,
+                entry = savedNews,
                 modifier = Modifier
             )
             //BottomNavigation(navContoller)

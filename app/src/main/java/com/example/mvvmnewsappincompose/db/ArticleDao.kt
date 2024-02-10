@@ -6,13 +6,14 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.example.mvvmnewsappincompose.models.Article
 
 @Dao
 interface ArticleDao{
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(article: Article): Long
+    @Upsert
+    suspend fun upsert(article: Article)
 
     @Query("SELECT * FROM articles")
     fun getAllArticles(): LiveData<List<Article>>

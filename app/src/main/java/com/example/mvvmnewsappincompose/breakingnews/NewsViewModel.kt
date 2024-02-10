@@ -2,8 +2,11 @@ package com.example.mvvmnewsappincompose.breakingnews
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mvvmnewsappincompose.MainActivity
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
@@ -11,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -22,10 +26,12 @@ class NewsViewModel @Inject constructor(
     var loadError = mutableStateOf("")
     var endReached = mutableStateOf(false)
     var breakingNews = mutableStateOf<List<Article>>(listOf())
+    var savedNews = mutableStateOf<List<Article>>(emptyList())
     var breakingNewsPage = 1
 
     init {
         getBreakingNews("us")
+        getSavedNews()
     }
 
     fun getBreakingNews(countryCode: String) {
@@ -58,8 +64,14 @@ class NewsViewModel @Inject constructor(
 
     }
 
-    fun saveArticle(article: Article) = viewModelScope.launch {
-        newsRepository.upsert(article)
+    fun saveArticle(article: Article) =
+        viewModelScope.launch {
+            Log.d("Article Save:", "saveArticle: SAVED ARTICLE HERE")
+            newsRepository.upsert(article)
+    }
+
+    fun getSavedNews()  = newsRepository.getSavedNews().observeForever {
+        savedNews.value += it
     }
 
     private fun hasInternetConnection(): Boolean {

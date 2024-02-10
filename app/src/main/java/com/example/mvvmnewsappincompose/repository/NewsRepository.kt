@@ -1,5 +1,7 @@
 package com.example.mvvmnewsappincompose.repository
 
+import android.util.Log
+import androidx.lifecycle.LiveData
 import com.example.mvvmnewsappincompose.api.RetrofitInstance
 import com.example.mvvmnewsappincompose.db.ArticleDao
 import com.example.mvvmnewsappincompose.db.ArticleDatabase
@@ -29,7 +31,9 @@ class NewsRepository @Inject constructor(
 
     //suspend fun upsert(article: Article) = db.getArticleDao().upsert(article)
 
-    //fun getSavedNews() = db.getArticleDao().getAllArticles()
+    fun getSavedNews(): LiveData<List<Article>> {
+        return dao.getAllArticles()
+    }
 
     //suspend fun deleteArticle(article: Article) = db.getArticleDao().deleteArticle(article)
 }
