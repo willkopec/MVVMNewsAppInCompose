@@ -101,6 +101,11 @@ class NewsViewModel @Inject constructor(
 
     }
 
+    fun deleteArticle(article: Article) = viewModelScope.launch {
+        newsRepository.deleteArticle(article)
+    }
+
+
 
 
     /*private fun handleBreakingNewsResponse(response: Response<NewsResponse>) : Resource<NewsResponse> {

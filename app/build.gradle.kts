@@ -92,6 +92,9 @@ dependencies {
     implementation ("com.squareup.moshi:moshi:1.8.0")
     kapt ("com.squareup.moshi:moshi-kotlin-codegen:1.8.0")
 
+    //Swipe
+    implementation ("me.saket.swipe:swipe:1.1.1")
+
 
     //implementation ("com.google.dagger:hilt-android:2.50")
     //kapt ("com.google.dagger:hilt-android-compiler:2.50")
