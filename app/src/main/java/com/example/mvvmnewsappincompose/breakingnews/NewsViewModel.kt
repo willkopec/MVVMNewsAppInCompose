@@ -70,9 +70,11 @@ class NewsViewModel @Inject constructor(
             newsRepository.upsert(article)
     }
 
-    fun getSavedNews()  = newsRepository.getSavedNews().observeForever {
-        savedNews.value += it
-    }
+    fun getSavedNews()  =
+        newsRepository.getSavedNews().observeForever {
+            savedNews.value = emptyList()
+            savedNews.value += it
+        }
 
     private fun hasInternetConnection(): Boolean {
         /*val connectivityManager = getApplication<NewsApplication>().getSystemService(

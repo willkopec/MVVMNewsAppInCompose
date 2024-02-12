@@ -91,7 +91,8 @@ fun SavedNewsListScreen(navController: NavController, viewModel: NewsViewModel =
             }*/
 
 
-            NewsArticleEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
+            //NewsArticleEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
+            SavedNewsEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
         }
     }
 }
@@ -208,7 +209,8 @@ fun SavedNewsEntry(
                 modifier = Modifier.padding(16.dp),
                 tint = Color.White
             )
-        }, background = Color.Red.copy(alpha = 0.5f),
+        },
+        background = Color.Red.copy(alpha = 0.5f),
         isUndo = true
     )
 
@@ -225,9 +227,9 @@ fun SavedNewsEntry(
                 .clickable {
                     val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
                     navController.navigate("saved_news/$encodedUrl")
-                }/*,
-                swipeThreshold = 350.dp,
-                endActions = listOf(delete)*/
+                }
+                ,swipeThreshold = 100.dp,
+                endActions = listOf(delete)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(0.3f)
@@ -246,9 +248,10 @@ fun SavedNewsEntry(
             val modifierForText: Modifier
 
             if (entry[rowIndex].urlToImage == null) {
-                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.Center)
+                modifierForText = Modifier.align(Alignment.Center)
             } else {
-                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.TopEnd)
+                modifierForText = Modifier.fillMaxWidth().align(Alignment.TopEnd)
+                    .padding(start = 150.dp)
             }
 
             Row(modifier = modifierForText) {
@@ -256,7 +259,7 @@ fun SavedNewsEntry(
                     if (entry[rowIndex].title != "[Removed]") {
                         entry[rowIndex].title?.let { it1 ->
                             Text(
-                                text = it1,
+                                text = it1.replace('+', ' '),
                                 fontSize = 12.sp,
                                 fontWeight = Bold,
                                 lineHeight = 15.sp,
@@ -269,7 +272,7 @@ fun SavedNewsEntry(
                         if (entry[rowIndex].description != null) {
                             entry[rowIndex].description?.let { it1 ->
                                 Text(
-                                    text = it1,
+                                    text = it1.replace('+', ' '),
                                     fontSize = 10.sp,
                                     textAlign = TextAlign.Center,
                                     lineHeight = 12.sp,
@@ -280,7 +283,7 @@ fun SavedNewsEntry(
                         } else {
                             entry[rowIndex].title?.let { it1 ->
                                 Text(
-                                    text = it1,
+                                    text = it1.replace('+', ' '),
                                     fontSize = 9.sp,
                                     textAlign = TextAlign.Center,
                                     lineHeight = 11.sp,
