@@ -227,8 +227,8 @@ fun SavedNewsEntry(
                 .clickable {
                     val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
                     navController.navigate("saved_news/$encodedUrl")
-                }
-                ,swipeThreshold = 100.dp,
+                },
+                swipeThreshold = 100.dp,
                 endActions = listOf(delete)
         ) {
             Row(
