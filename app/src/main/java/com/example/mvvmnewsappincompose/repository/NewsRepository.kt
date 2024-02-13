@@ -26,8 +26,15 @@ class NewsRepository @Inject constructor(
     suspend fun upsert(article: Article) = dao.upsert(article)
 
 
-    /*suspend fun searchNews(searchQuery: String, pageNumber: Int) =
-        RetrofitInstance.api.searchForNews(searchQuery, pageNumber)*/
+    suspend fun searchNews(searchQuery: String, pageNumber: Int): Resource<NewsResponse> {
+        val response = try {
+            RetrofitInstance.api.searchForNews(searchQuery)
+        } catch (e: Exception){
+            return Resource.Error("An unknown error occured!")
+        }
+        return Resource.Success(response)
+    }
+
 
     //suspend fun upsert(article: Article) = db.getArticleDao().upsert(article)
 

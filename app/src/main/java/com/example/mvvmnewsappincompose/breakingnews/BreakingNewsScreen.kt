@@ -58,17 +58,20 @@ fun BreakingNewsListScreen(
         val itemCount = breakingNewsList.size
 
         items(itemCount) {
-            if (it >= itemCount - 1) {
 
+            if (it >= itemCount - 1) {
                 LaunchedEffect(key1 = true) { viewModel.getBreakingNews("us") }
             }
+
             NewsArticleEntry(
                 navController,
                 rowIndex = it,
                 entry = breakingNewsList,
                 modifier = Modifier
             )
+
         }
+
     }
 }
 
@@ -82,18 +85,36 @@ fun SavedNewsListScreen(navController: NavController, viewModel: NewsViewModel =
         val itemCount = savedNews.size
 
         items(itemCount) {
-            //no need to paginate as savedNews already contains all of the saved news from the local database in room
-            /*if (it >= itemCount - 1) {
-
-                LaunchedEffect(key1 = true) {
-                    // viewModel.getSavedNews()
-                }
-            }*/
-
-
-            //NewsArticleEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
+            //no need to paginate as savedNews already contains all of the saved news from the Article database
+            //so all is loaded at once
             SavedNewsEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
         }
+    }
+}
+
+@Composable
+fun SearchNewsScreen(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
+
+    val searchNews by remember { viewModel.searchNews }
+
+    LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
+        val itemCount = searchNews.size
+
+        items(itemCount) {
+            if (it >= itemCount - 1) {
+
+                LaunchedEffect(key1 = true) { viewModel.searchNews("") }
+
+            }
+
+            NewsArticleEntry(
+                navController,
+                rowIndex = it,
+                entry = searchNews,
+                modifier = Modifier
+            )
+        }
+
     }
 }
 
