@@ -54,7 +54,7 @@ fun BreakingNewsListScreen(
 
     val breakingNewsList by remember { viewModel.breakingNews }
 
-    LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
+    LazyColumn() {
         val itemCount = breakingNewsList.size
 
         items(itemCount) {

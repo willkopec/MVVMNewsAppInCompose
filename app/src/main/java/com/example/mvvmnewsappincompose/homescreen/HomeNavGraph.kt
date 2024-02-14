@@ -43,7 +43,6 @@ fun HomeNavGraph(navController: NavHostController) {
                 navController = navController,
                 onClick = { }
             )
-            //WebViewScreen("https://www.google.com")
         }
         composable(route = BottomBarScreen.SearchNews.route) {
             SearchNewsScreen(
@@ -64,24 +63,12 @@ fun HomeNavGraph(navController: NavHostController) {
             val articleJson = backStackEntry.arguments?.getString("article")
             val moshi = Moshi.Builder().build()
             val jsonAdapter = moshi.adapter(Article::class.java).lenient()
-            URLDecoder.decode(articleJson, "utf-8")
-
             val currentArticle = jsonAdapter.fromJson(articleJson)
             
             //WebViewScreen(url = "https://www.google.com")
             if (currentArticle != null) {
                 WebViewScreen(currentArticle)
             }
-
-
-            /*val articleUrl = remember {
-                it.arguments?.getString("articleUrl")
-            }
-
-            //need to pass an "https://" link to not cause an error
-            if (articleUrl != null) {
-                WebViewScreen(articleUrl)
-            }*/
 
         }
 

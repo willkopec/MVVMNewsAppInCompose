@@ -19,9 +19,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mvvmnewsappincompose.R
 import com.example.mvvmnewsappincompose.breakingnews.NewsViewModel
 import com.example.mvvmnewsappincompose.models.Article
 
@@ -47,7 +50,7 @@ fun WebViewScreen(
                 },
                 modifier = Modifier.size(50.dp)
             ) {
-                Icon(Icons.Filled.Add,"")
+                Icon(ImageVector.vectorResource(R.drawable.ic_favorite),"")
 
             }
         }
