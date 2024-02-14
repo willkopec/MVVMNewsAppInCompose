@@ -14,6 +14,7 @@ import com.example.mvvmnewsappincompose.breakingnews.BreakingNewsScreen
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.newsarticle.WebViewScreen
 import com.example.mvvmnewsappincompose.savednews.SavedNewsScreen
+import com.example.mvvmnewsappincompose.searchnews.SearchNewsScreen
 import com.example.mvvmnewsappincompose.util.BottomBarScreen
 import com.squareup.moshi.Moshi
 import java.net.URLDecoder
@@ -45,7 +46,8 @@ fun HomeNavGraph(navController: NavHostController) {
             //WebViewScreen("https://www.google.com")
         }
         composable(route = BottomBarScreen.SearchNews.route) {
-            ScreenContent(
+            SearchNewsScreen(
+                navController = navController,
                 name = BottomBarScreen.SearchNews.route,
                 onClick = { }
             )

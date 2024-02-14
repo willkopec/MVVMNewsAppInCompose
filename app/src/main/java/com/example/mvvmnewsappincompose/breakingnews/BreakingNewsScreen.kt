@@ -93,17 +93,21 @@ fun SavedNewsListScreen(navController: NavController, viewModel: NewsViewModel =
 }
 
 @Composable
-fun SearchNewsScreen(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
+fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
 
     val searchNews by remember { viewModel.searchNews }
+    val isSearching by remember { viewModel.isSearching }
+    val endReached by remember {  viewModel.endReached  }
+    val loadError by remember {  viewModel.loadError  }
+    val isLoading by remember {  viewModel.isLoading  }
 
     LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
         val itemCount = searchNews.size
 
         items(itemCount) {
-            if (it >= itemCount - 1) {
+            if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
 
-                LaunchedEffect(key1 = true) { viewModel.searchNews("") }
+                //LaunchedEffect(key1 = true) { viewModel.searchNews("") }
 
             }
 

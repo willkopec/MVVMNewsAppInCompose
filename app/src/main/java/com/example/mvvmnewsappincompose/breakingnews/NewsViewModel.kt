@@ -11,8 +11,10 @@ import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.log
 
@@ -28,9 +30,12 @@ class NewsViewModel @Inject constructor(
     var breakingNews = mutableStateOf<List<Article>>(listOf())
     var savedNews = mutableStateOf<List<Article>>(emptyList())
     var searchNews = mutableStateOf<List<Article>>(listOf())
+    var isSearching = mutableStateOf(false)
 
     var breakingNewsPage = 1
     var searchNewsPage = 1
+
+    private var isSearchStarting = true
 
     init {
         getBreakingNews("us")
@@ -67,37 +72,47 @@ class NewsViewModel @Inject constructor(
 
     }
 
+
     fun searchNews(query: String){
 
-        if(query != ""){
+            viewModelScope.launch(Dispatchers.Default) {
 
-            viewModelScope.launch {
+                if(query.isEmpty() || query.length < 3) {
+                    searchNews.value = emptyList()
+                    isSearching.value = false
+                    isSearchStarting = true
+                    return@launch
+                }
+
                 isLoading.value = true
+                searchNews.value = emptyList()
                 var result = newsRepository.searchNews(query, searchNewsPage)
-                Log.d("GetBreakingNews Function", "getBreakingNews: ${searchNewsPage} Breaking news size: ${savedNews.value.size}")
+
+
                 when(result) {
                     is Resource.Success -> {
-
-                        val searchNewsResult = result.data?.articles!!.mapIndexed { index, article ->
-                            Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
+                        endReached.value = searchNewsPage * 20 >= result.data!!.articles.size
+                        val searchNewsResults = result.data!!.articles.mapIndexed { index, entry ->
+                            Article(entry.author,entry.content,entry.description, entry.publishedAt, entry.source, entry.title, entry.url, entry.urlToImage)
                         }
-
                         searchNewsPage++
-                        searchNews.value += searchNewsResult
 
+                        loadError.value = ""
+                        isLoading.value = false
+                        searchNews.value += searchNewsResults
                     }
                     is Resource.Error -> {
-                        //loadError.value = result.message!!
-                        //isLoading.value = false
+                        loadError.value = result.message!!
+                        isLoading.value = false
 
                     }
+                    is Resource.Loading -> {
 
-                    else -> {}
+                    }
                 }
 
             }
 
-        }
 
     }
 
