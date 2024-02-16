@@ -82,26 +82,6 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmallTopAppBar() {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text("Small Top App Bar")
-                }
-            )
-        },
-    ) {
-        paddingValues -> paddingValues
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun BottomNavigation(
     navController: NavHostController
 ) {

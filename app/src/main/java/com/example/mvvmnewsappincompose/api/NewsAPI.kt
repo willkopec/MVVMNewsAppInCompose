@@ -29,4 +29,14 @@ interface NewsAPI {
         apiKey: String = API_KEY2
     ): NewsResponse
 
+    @GET("v2/everything")
+    suspend fun getEconomicNews(
+        @Query("q")
+        searchQuery: String = "economy nasdaq federal-reserve stocks",
+        @Query("page")
+        pageNumber :  Int = 1,
+        @Query("apiKey")
+        apiKey: String = API_KEY2
+    ): NewsResponse
+
 }

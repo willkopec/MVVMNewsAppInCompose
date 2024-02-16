@@ -1,38 +1,57 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
+import com.example.mvvmnewsappincompose.SortType
+import com.example.mvvmnewsappincompose.getAllTypes
+import com.example.mvvmnewsappincompose.getSortType
 import com.example.mvvmnewsappincompose.models.Article
 import com.squareup.moshi.Moshi
 import me.saket.swipe.SwipeAction
@@ -40,10 +59,27 @@ import me.saket.swipe.SwipeableActionsBox
 import java.net.URLEncoder
 
 @Composable
-fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit) {
-    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
-        BreakingNewsListScreen(navController)
+fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit, viewModel: NewsViewModel = hiltViewModel()) {
+
+    val currentSortType by remember {
+        viewModel.currentSortType
     }
+
+    Column {
+
+        ChipGroup(
+            chips = getAllTypes(),
+            selectedType = currentSortType,
+            onSelectedChanged = {
+                viewModel.currentSortType.value = getSortType(it)
+            }
+        )
+
+        Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
+            BreakingNewsListScreen(navController)
+        }
+    }
+
 }
 
 @Composable
@@ -54,7 +90,8 @@ fun BreakingNewsListScreen(
 
     val breakingNewsList by remember { viewModel.breakingNews }
 
-    LazyColumn() {
+    LazyColumn {
+
         val itemCount = breakingNewsList.size
 
         items(itemCount) {
@@ -74,6 +111,63 @@ fun BreakingNewsListScreen(
 
     }
 }
+
+@Composable
+fun Chip(
+    name: String = "Chip",
+    isSelected: Boolean = false,
+    onSelectionChanged: (String) -> Unit = {},
+) {
+    Surface(
+        modifier = Modifier.padding(1.dp),
+        shape = MaterialTheme.shapes.small,
+        color = if (isSelected) Color.DarkGray else MaterialTheme.colorScheme.primary
+    ) {
+        Row(modifier = Modifier
+            .toggleable(
+                value = isSelected,
+                onValueChange = {
+                    onSelectionChanged(name)
+                }
+            )
+        ) {
+            Text(
+                text = name,
+                color = Color.White,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ChipGroup(
+    chips: List<SortType> = getAllTypes(),
+    selectedType: SortType? = null,
+    viewModel: NewsViewModel = hiltViewModel(),
+    onSelectedChanged: (String) -> Unit = {},
+) {
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(color = Color.LightGray)
+    ) {
+        LazyRow(modifier = Modifier) {
+            items(chips) {
+                Chip(
+                    name = it.value,
+                    isSelected = selectedType == it,
+                    onSelectionChanged = {
+                        onSelectedChanged(it)
+                    },
+                )
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun SavedNewsListScreen(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
@@ -155,7 +249,9 @@ fun NewsArticleEntry(
                     SubcomposeAsyncImage(
                         model = entry[rowIndex].urlToImage,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxHeight(),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(5.dp)),
                         loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
                     )
                 }
@@ -164,9 +260,13 @@ fun NewsArticleEntry(
             val modifierForText: Modifier
 
             if (entry[rowIndex].urlToImage == null) {
-                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.Center)
+                modifierForText = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.Center)
             } else {
-                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.TopEnd)
+                modifierForText = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.TopEnd)
             }
 
             Row(modifier = modifierForText) {
@@ -253,8 +353,8 @@ fun SavedNewsEntry(
                     val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
                     navController.navigate("saved_news/$encodedUrl")
                 },
-                swipeThreshold = 100.dp,
-                endActions = listOf(delete)
+            swipeThreshold = 100.dp,
+            endActions = listOf(delete)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(0.3f)
@@ -275,7 +375,9 @@ fun SavedNewsEntry(
             if (entry[rowIndex].urlToImage == null) {
                 modifierForText = Modifier.align(Alignment.Center)
             } else {
-                modifierForText = Modifier.fillMaxWidth().align(Alignment.TopEnd)
+                modifierForText = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopEnd)
                     .padding(start = 150.dp)
             }
 

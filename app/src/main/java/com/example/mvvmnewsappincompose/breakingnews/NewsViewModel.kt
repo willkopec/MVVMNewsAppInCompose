@@ -7,12 +7,17 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mvvmnewsappincompose.MainActivity
+import com.example.mvvmnewsappincompose.SortType
+import com.example.mvvmnewsappincompose.getAllTypes
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -27,6 +32,7 @@ class NewsViewModel @Inject constructor(
     var isLoading = mutableStateOf(true)
     var loadError = mutableStateOf("")
     var endReached = mutableStateOf(false)
+    var currentNews = mutableStateOf<List<Article>>(listOf())
     var breakingNews = mutableStateOf<List<Article>>(listOf())
     var savedNews = mutableStateOf<List<Article>>(emptyList())
     var searchNews = mutableStateOf<List<Article>>(listOf())
@@ -36,6 +42,18 @@ class NewsViewModel @Inject constructor(
     var searchNewsPage = 1
 
     private var isSearchStarting = true
+
+    var currentSortType = mutableStateOf(getAllTypes()[0])
+    /*private val _contacts = _sortType
+        .flatMapLatest { sortType ->
+            when(sortType) {
+                SortType.BREAKING ->
+                /*SortType.FIRST_NAME -> dao.getContactsOrderedByFirstName()
+                SortType.LAST_NAME -> dao.getContactsOrderedByLastName()
+                SortType.PHONE_NUMBER -> dao.getContactsOrderedByPhoneNumber()*/
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())*/
 
     init {
         getBreakingNews("us")
@@ -57,12 +75,10 @@ class NewsViewModel @Inject constructor(
 
                     breakingNewsPage++
                     breakingNews.value += breakingNewsArticles
-
                 }
                 is Resource.Error -> {
-                    //loadError.value = result.message!!
-                    //isLoading.value = false
-
+                    loadError.value = result.message!!
+                    isLoading.value = false
                 }
 
                 else -> {}
