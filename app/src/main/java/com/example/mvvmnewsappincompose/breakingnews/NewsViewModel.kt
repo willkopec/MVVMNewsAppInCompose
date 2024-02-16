@@ -1,8 +1,10 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,6 +54,14 @@ class NewsViewModel @Inject constructor(
         getSavedNews()
         getEconomicNews()
         getSportsNews()
+    }
+
+    private var _scrollToTop = MutableLiveData(false)
+    val scrollToTop: LiveData<Boolean>
+        get() = _scrollToTop
+
+    fun updateScrollToTop(scroll: Boolean) {
+        _scrollToTop.postValue(scroll)
     }
 
     fun getBreakingNews(countryCode: String) {

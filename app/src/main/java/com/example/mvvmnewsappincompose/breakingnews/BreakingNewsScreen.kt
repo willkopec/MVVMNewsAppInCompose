@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
@@ -70,6 +73,7 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
             selectedType = currentSortType,
             onSelectedChanged = {
                 viewModel.currentSortType.value = getSortType(it)
+                viewModel.updateScrollToTop(true)
             }
         )
 
@@ -93,15 +97,28 @@ fun BreakingNewsListScreen(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    LazyColumn {
+    val scrollState = rememberLazyListState()
+    val scrollToTop by viewModel.scrollToTop.observeAsState()
+
+    LaunchedEffect(
+        key1 = scrollToTop,
+    ) {
+        if (scrollToTop == true) {
+            scrollState.scrollToItem(0)
+            viewModel.updateScrollToTop(false)
+        }
+    }
+
+    LazyColumn (state = scrollState){
 
         val itemCount = currentNewsList.size
 
         items(itemCount) {
 
-            if (it >= itemCount - 1) {
+            //if (it >= itemCount - 1) {
+
                 //LaunchedEffect(key1 = true) { viewModel.getBreakingNews("us") }
-            }
+            //}
 
             NewsArticleEntry(
                 navController,
