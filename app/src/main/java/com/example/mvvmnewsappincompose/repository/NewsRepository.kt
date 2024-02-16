@@ -36,7 +36,23 @@ class NewsRepository @Inject constructor(
     }
 
 
-    //suspend fun upsert(article: Article) = db.getArticleDao().upsert(article)
+    suspend fun getEconomicNews(): Resource<NewsResponse>{
+        val response = try {
+            RetrofitInstance.api.getEconomicNews()
+        } catch (e: Exception){
+            return Resource.Error("An unknown error occured!")
+        }
+        return Resource.Success(response)
+    }
+
+    suspend fun getSportsNews(): Resource<NewsResponse>{
+        val response = try {
+            RetrofitInstance.api.getSportsNews()
+        } catch (e: Exception){
+            return Resource.Error("An unknown error occured!")
+        }
+        return Resource.Success(response)
+    }
 
     fun getSavedNews(): LiveData<List<Article>> {
         return dao.getAllArticles()

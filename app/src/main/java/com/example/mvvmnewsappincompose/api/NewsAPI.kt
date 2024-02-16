@@ -39,4 +39,14 @@ interface NewsAPI {
         apiKey: String = API_KEY2
     ): NewsResponse
 
+    @GET("v2/everything")
+    suspend fun getSportsNews(
+        @Query("q")
+        searchQuery: String = "sports football soccer tennis basketball",
+        @Query("page")
+        pageNumber :  Int = 1,
+        @Query("apiKey")
+        apiKey: String = API_KEY2
+    ): NewsResponse
+
 }

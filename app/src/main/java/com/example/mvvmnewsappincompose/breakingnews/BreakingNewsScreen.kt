@@ -61,9 +61,7 @@ import java.net.URLEncoder
 @Composable
 fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit, viewModel: NewsViewModel = hiltViewModel()) {
 
-    val currentSortType by remember {
-        viewModel.currentSortType
-    }
+    val currentSortType by remember { viewModel.currentSortType }
 
     Column {
 
@@ -75,8 +73,14 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
             }
         )
 
+        when(currentSortType){
+            SortType.BREAKING -> viewModel.currentNews = viewModel.breakingNews
+            SortType.ECONOMIC -> viewModel.currentNews = viewModel.economicNews
+            SortType.Sports -> viewModel.currentNews = viewModel.sportsNews
+        }
+
         Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
-            BreakingNewsListScreen(navController)
+            BreakingNewsListScreen(viewModel.currentNews.value, navController)
         }
     }
 
@@ -84,26 +88,25 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
 
 @Composable
 fun BreakingNewsListScreen(
+    currentNewsList: List<Article>,
     navController: NavController,
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    val breakingNewsList by remember { viewModel.breakingNews }
-
     LazyColumn {
 
-        val itemCount = breakingNewsList.size
+        val itemCount = currentNewsList.size
 
         items(itemCount) {
 
             if (it >= itemCount - 1) {
-                LaunchedEffect(key1 = true) { viewModel.getBreakingNews("us") }
+                //LaunchedEffect(key1 = true) { viewModel.getBreakingNews("us") }
             }
 
             NewsArticleEntry(
                 navController,
                 rowIndex = it,
-                entry = breakingNewsList,
+                entry = currentNewsList,
                 modifier = Modifier
             )
 

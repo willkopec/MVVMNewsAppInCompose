@@ -34,6 +34,8 @@ class NewsViewModel @Inject constructor(
     var endReached = mutableStateOf(false)
     var currentNews = mutableStateOf<List<Article>>(listOf())
     var breakingNews = mutableStateOf<List<Article>>(listOf())
+    var economicNews = mutableStateOf<List<Article>>(listOf())
+    var sportsNews = mutableStateOf<List<Article>>(listOf())
     var savedNews = mutableStateOf<List<Article>>(emptyList())
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
@@ -44,20 +46,12 @@ class NewsViewModel @Inject constructor(
     private var isSearchStarting = true
 
     var currentSortType = mutableStateOf(getAllTypes()[0])
-    /*private val _contacts = _sortType
-        .flatMapLatest { sortType ->
-            when(sortType) {
-                SortType.BREAKING ->
-                /*SortType.FIRST_NAME -> dao.getContactsOrderedByFirstName()
-                SortType.LAST_NAME -> dao.getContactsOrderedByLastName()
-                SortType.PHONE_NUMBER -> dao.getContactsOrderedByPhoneNumber()*/
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())*/
 
     init {
         getBreakingNews("us")
         getSavedNews()
+        getEconomicNews()
+        getSportsNews()
     }
 
     fun getBreakingNews(countryCode: String) {
@@ -75,6 +69,61 @@ class NewsViewModel @Inject constructor(
 
                     breakingNewsPage++
                     breakingNews.value += breakingNewsArticles
+                    //currentNews.value += breakingNewsArticles
+                }
+                is Resource.Error -> {
+                    loadError.value = result.message!!
+                    isLoading.value = false
+                }
+
+                else -> {}
+            }
+
+        }
+
+    }
+
+    fun getEconomicNews() {
+        viewModelScope.launch {
+            isLoading.value = true
+            //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
+            var result = newsRepository.getEconomicNews()
+            when(result) {
+                is Resource.Success -> {
+
+                    val economicNewsArticles = result.data?.articles!!.mapIndexed { index, article ->
+                        Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
+                    }
+
+                    breakingNewsPage++
+                    economicNews.value += economicNewsArticles
+                }
+                is Resource.Error -> {
+                    loadError.value = result.message!!
+                    isLoading.value = false
+                }
+
+                else -> {}
+            }
+
+        }
+
+    }
+
+    fun getSportsNews() {
+        viewModelScope.launch {
+            isLoading.value = true
+            //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
+            var result = newsRepository.getSportsNews()
+            when(result) {
+                is Resource.Success -> {
+
+                    val sportsNewsArticles = result.data?.articles!!.mapIndexed { index, article ->
+                        Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
+                    }
+
+                    breakingNewsPage++
+                    sportsNews.value += sportsNewsArticles
                 }
                 is Resource.Error -> {
                     loadError.value = result.message!!
@@ -141,7 +190,9 @@ class NewsViewModel @Inject constructor(
     fun getSavedNews()  =
         newsRepository.getSavedNews().observeForever {
             savedNews.value = emptyList()
+            //currentNews.value = emptyList()
             savedNews.value += it
+            //currentNews.value += it
         }
 
     private fun hasInternetConnection(): Boolean {
