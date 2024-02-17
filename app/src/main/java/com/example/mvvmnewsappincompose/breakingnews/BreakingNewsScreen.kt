@@ -80,7 +80,8 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
         when(currentSortType){
             SortType.BREAKING -> viewModel.currentNews = viewModel.breakingNews
             SortType.ECONOMIC -> viewModel.currentNews = viewModel.economicNews
-            SortType.Sports -> viewModel.currentNews = viewModel.sportsNews
+            SortType.SPORTS -> viewModel.currentNews = viewModel.sportsNews
+            SortType.HEALTH -> viewModel.currentNews = viewModel.healthNews
         }
 
         Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
@@ -215,7 +216,7 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
     val loadError by remember {  viewModel.loadError  }
     val isLoading by remember {  viewModel.isLoading  }
 
-    LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
+    LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/) {
         val itemCount = searchNews.size
 
         items(itemCount) {
@@ -393,7 +394,7 @@ fun SavedNewsEntry(
             val modifierForText: Modifier
 
             if (entry[rowIndex].urlToImage == null) {
-                modifierForText = Modifier.align(Alignment.Center)
+                modifierForText = Modifier.fillMaxWidth()
             } else {
                 modifierForText = Modifier
                     .fillMaxWidth()

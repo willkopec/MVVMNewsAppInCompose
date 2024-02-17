@@ -14,6 +14,28 @@ import javax.inject.Inject
 class NewsRepository @Inject constructor(
     val dao: ArticleDao
 ) {
+
+    /********************************************
+    * Room Local Database data/information functions
+    *
+    * These functions are used to store, delete and retrieve data from the article Database
+    *
+    ********************************************/
+    suspend fun upsert(article: Article) = dao.upsert(article)
+
+    suspend fun deleteArticle(article: Article) = dao.deleteArticle(article)
+
+    fun getSavedNews(): LiveData<List<Article>> {
+        return dao.getAllArticles()
+    }
+
+    /********************************************
+     * Retrofit API request functions from NewsApi.org
+     *
+     * These functions are used to retrieve data from the API via retrofit instance requests
+     *
+     ********************************************/
+
     suspend fun getBreakingNews(countryCode: String, pageNumber: Int) : Resource<NewsResponse> {
         val response = try {
             RetrofitInstance.api.getBreakingNews(countryCode, pageNumber)
@@ -22,9 +44,6 @@ class NewsRepository @Inject constructor(
         }
         return Resource.Success(response)
     }
-
-    suspend fun upsert(article: Article) = dao.upsert(article)
-
 
     suspend fun searchNews(searchQuery: String, pageNumber: Int): Resource<NewsResponse> {
         val response = try {
@@ -54,9 +73,13 @@ class NewsRepository @Inject constructor(
         return Resource.Success(response)
     }
 
-    fun getSavedNews(): LiveData<List<Article>> {
-        return dao.getAllArticles()
+    suspend fun getHealthNews(): Resource<NewsResponse>{
+        val response = try {
+            RetrofitInstance.api.getHealthNews()
+        } catch (e: Exception){
+            return Resource.Error("An unknown error occured!")
+        }
+        return Resource.Success(response)
     }
 
-    suspend fun deleteArticle(article: Article) = dao.deleteArticle(article)
 }

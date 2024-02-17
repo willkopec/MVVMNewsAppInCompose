@@ -3,11 +3,12 @@ package com.example.mvvmnewsappincompose
 enum class SortType(val value: String){
     BREAKING("Breaking News"),
     ECONOMIC("Economic News"),
-    Sports("Sports News"),
+    SPORTS("Sports News"),
+    HEALTH("Health News")
 }
 
 fun getAllTypes(): List<SortType>{
-    return listOf(SortType.BREAKING, SortType.ECONOMIC, SortType.Sports)
+    return listOf(SortType.BREAKING, SortType.ECONOMIC, SortType.SPORTS, SortType.HEALTH)
 }
 
 fun getSortType(value: String): SortType {

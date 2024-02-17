@@ -102,8 +102,8 @@ fun BottomNavigation(
         ),
         BottomNavigationItem(
             title = "Search News",
-            selectedIcon = ImageVector.vectorResource(R.drawable.ic_all_news),
-            unSelectedIcon = ImageVector.vectorResource(R.drawable.ic_all_news),
+            selectedIcon = ImageVector.vectorResource(R.drawable.baseline_search_24),
+            unSelectedIcon = ImageVector.vectorResource(R.drawable.baseline_search_24),
             hasNews = false,
         ),
 

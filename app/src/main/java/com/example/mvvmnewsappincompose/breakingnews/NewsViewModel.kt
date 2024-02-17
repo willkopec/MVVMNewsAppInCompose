@@ -38,6 +38,7 @@ class NewsViewModel @Inject constructor(
     var breakingNews = mutableStateOf<List<Article>>(listOf())
     var economicNews = mutableStateOf<List<Article>>(listOf())
     var sportsNews = mutableStateOf<List<Article>>(listOf())
+    var healthNews = mutableStateOf<List<Article>>(listOf())
     var savedNews = mutableStateOf<List<Article>>(emptyList())
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
@@ -54,6 +55,7 @@ class NewsViewModel @Inject constructor(
         getSavedNews()
         getEconomicNews()
         getSportsNews()
+        getHealthNews()
     }
 
     private var _scrollToTop = MutableLiveData(false)
@@ -134,6 +136,33 @@ class NewsViewModel @Inject constructor(
 
                     breakingNewsPage++
                     sportsNews.value += sportsNewsArticles
+                }
+                is Resource.Error -> {
+                    loadError.value = result.message!!
+                    isLoading.value = false
+                }
+
+                else -> {}
+            }
+
+        }
+
+    }
+
+    fun getHealthNews() {
+        viewModelScope.launch {
+            isLoading.value = true
+            //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
+            var result = newsRepository.getHealthNews()
+            when(result) {
+                is Resource.Success -> {
+
+                    val healthNewsArticles = result.data?.articles!!.mapIndexed { index, article ->
+                        Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
+                    }
+
+                    breakingNewsPage++
+                    healthNews.value += healthNewsArticles
                 }
                 is Resource.Error -> {
                     loadError.value = result.message!!

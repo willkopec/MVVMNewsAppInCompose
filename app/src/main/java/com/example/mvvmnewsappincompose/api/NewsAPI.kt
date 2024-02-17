@@ -16,7 +16,7 @@ interface NewsAPI {
         @Query("page")
         pageNumber :  Int = 1,
         @Query("apiKey")
-        apiKey: String = API_KEY2
+        apiKey: String = API_KEY
     ): NewsResponse
 
     @GET("v2/everything")
@@ -26,7 +26,7 @@ interface NewsAPI {
         @Query("page")
         pageNumber :  Int = 1,
         @Query("apiKey")
-        apiKey: String = API_KEY2
+        apiKey: String = API_KEY
     ): NewsResponse
 
     @GET("v2/everything")
@@ -36,7 +36,7 @@ interface NewsAPI {
         @Query("page")
         pageNumber :  Int = 1,
         @Query("apiKey")
-        apiKey: String = API_KEY2
+        apiKey: String = API_KEY
     ): NewsResponse
 
     @GET("v2/everything")
@@ -46,7 +46,17 @@ interface NewsAPI {
         @Query("page")
         pageNumber :  Int = 1,
         @Query("apiKey")
-        apiKey: String = API_KEY2
+        apiKey: String = API_KEY
+    ): NewsResponse
+
+    @GET("v2/everything")
+    suspend fun getHealthNews(
+        @Query("q")
+        searchQuery: String = "health fitness gym sick",
+        @Query("page")
+        pageNumber :  Int = 1,
+        @Query("apiKey")
+        apiKey: String = API_KEY
     ): NewsResponse
 
 }

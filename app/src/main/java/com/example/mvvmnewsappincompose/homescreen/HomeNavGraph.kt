@@ -48,7 +48,8 @@ fun HomeNavGraph(navController: NavHostController) {
             SearchNewsScreen(
                 navController = navController,
                 name = BottomBarScreen.SearchNews.route,
-                onClick = { }
+                onClick = { },
+                true
             )
         }
 

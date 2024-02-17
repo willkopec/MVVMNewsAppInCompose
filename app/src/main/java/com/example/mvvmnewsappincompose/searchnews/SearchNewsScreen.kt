@@ -43,6 +43,7 @@ fun SearchNewsScreen(
     navController: NavController,
     name: String,
     onClick: () -> Unit,
+    isSelected: Boolean,
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
@@ -63,9 +64,10 @@ fun SearchNewsScreen(
                 hint = "Search...",
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(if (isSelected) Color.LightGray else MaterialTheme.colorScheme.primary)
                     .padding(16.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            //Spacer(modifier = Modifier.height(16.dp))
             SearchNewsResults(navController = navController)
         }
 
