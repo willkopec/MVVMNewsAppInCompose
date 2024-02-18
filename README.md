@@ -47,6 +47,6 @@ We welcome any feedback or suggestions for improving the News App. Feel free to 
 ![github2](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/9d2161dd-44e4-4e23-98c6-bfce3a076d74)
 ![github3](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/a4548467-cedc-4a0d-b683-89f59921f86a)
 ![github4](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/889f013f-f6c4-4543-a634-199316c4995c)
-![github7](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/088507fc-1352-43b7-aa6c-8f80e1f3b52e)
 ![github5](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/d1ec9468-e069-4c2a-a562-63393c201ddb)
+![github7](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/088507fc-1352-43b7-aa6c-8f80e1f3b52e)
 ![github6](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/325f0b25-cc5c-4aee-bcfb-46136f0e953c)
