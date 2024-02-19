@@ -42,6 +42,7 @@ class NewsViewModel @Inject constructor(
     var savedNews = mutableStateOf<List<Article>>(emptyList())
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
+    var currentSnackBarMessage = mutableStateOf("")
 
     var breakingNewsPage = 1
     var searchNewsPage = 1

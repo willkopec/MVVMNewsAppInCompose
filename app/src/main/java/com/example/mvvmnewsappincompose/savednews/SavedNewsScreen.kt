@@ -22,6 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mvvmnewsappincompose.breakingnews.SavedNewsListScreen
+import com.example.mvvmnewsappincompose.breakingnews.SavedNewsListScreenWithSnackBar
 
 @Composable
 fun SavedNewsScreen(
@@ -34,7 +35,7 @@ fun SavedNewsScreen(
         color = Color.White,
         modifier = Modifier.fillMaxSize()
     ) {
-        SavedNewsListScreen(navController)
+        SavedNewsListScreenWithSnackBar(navController)
     }
 
 }

@@ -7,6 +7,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
+/*-------------------------------
+*
+* RetrofitInstance: This file contains the retrofit object which uses
+* the baseUrl string to get the api Request
+*
+* ------------------------------- */
+
 class RetrofitInstance {
 
     companion object{

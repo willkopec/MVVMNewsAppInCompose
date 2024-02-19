@@ -17,7 +17,13 @@ import com.example.mvvmnewsappincompose.savednews.SavedNewsScreen
 import com.example.mvvmnewsappincompose.searchnews.SearchNewsScreen
 import com.example.mvvmnewsappincompose.util.BottomBarScreen
 import com.squareup.moshi.Moshi
-import java.net.URLDecoder
+
+/*
+ * ------------------------------------
+ * HomeNavGraph: Contains the NavHost
+ * and different route names/composables
+ * ------------------------------------
+ */
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
@@ -30,47 +36,43 @@ fun HomeNavGraph(navController: NavHostController) {
             BreakingNewsScreen(
                 navController,
                 name = BottomBarScreen.BreakingNews.route,
-                onClick = { /*TODO*/ }
+                onClick = { /*TODO*/}
             )
         }
         composable(route = BottomBarScreen.SavedNews.route) {
-            /*ScreenContent(
-                name = BottomBarScreen.Profile.route,
-                onClick = { navController.navigate(Graph.DETAILS) }
-            )*/
             SavedNewsScreen(
                 name = BottomBarScreen.SavedNews.route,
                 navController = navController,
-                onClick = { }
+                onClick = {}
             )
         }
         composable(route = BottomBarScreen.SearchNews.route) {
             SearchNewsScreen(
                 navController = navController,
                 name = BottomBarScreen.SearchNews.route,
-                onClick = { },
+                onClick = {},
                 true
             )
         }
 
-        composable(route = "saved_news/{article}",
-            arguments = listOf(
-                navArgument("article") {
-                    type = NavType.StringType
-                }
-            )
-        ) {backStackEntry ->
-
+        /*
+        This composable is for each article. An article should be passed into this function
+        Via it's route parameter/navArguments. It is then transferred over via moshi and passed
+        into the WebViewScreen to access the current article
+         */
+        composable(
+            route = "saved_news/{article}",
+            arguments = listOf(navArgument("article") { type = NavType.StringType })
+        ) { backStackEntry ->
             val articleJson = backStackEntry.arguments?.getString("article")
             val moshi = Moshi.Builder().build()
             val jsonAdapter = moshi.adapter(Article::class.java).lenient()
             val currentArticle = jsonAdapter.fromJson(articleJson)
-            
-            //WebViewScreen(url = "https://www.google.com")
+
+            // WebViewScreen(url = "https://www.google.com")
             if (currentArticle != null) {
                 WebViewScreen(currentArticle)
             }
-
         }
 
         detailsNavGraph(navController = navController)
@@ -78,10 +80,7 @@ fun HomeNavGraph(navController: NavHostController) {
 }
 
 fun NavGraphBuilder.detailsNavGraph(navController: NavHostController) {
-    navigation(
-        route = Graph.DETAILS,
-        startDestination = DetailsScreen.Information.route
-    ) {
+    navigation(route = Graph.DETAILS, startDestination = DetailsScreen.Information.route) {
         composable(route = DetailsScreen.Information.route) {
             ScreenContent(name = DetailsScreen.Information.route) {
                 navController.navigate(DetailsScreen.Overview.route)

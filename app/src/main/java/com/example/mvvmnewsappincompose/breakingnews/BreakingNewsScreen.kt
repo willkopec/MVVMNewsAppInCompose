@@ -1,5 +1,6 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,9 +63,18 @@ import com.example.mvvmnewsappincompose.getAllTypes
 import com.example.mvvmnewsappincompose.getSortType
 import com.example.mvvmnewsappincompose.models.Article
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 import java.net.URLEncoder
+
+/*
+*
+* BreakingNewsScreen: This file contains all of the needed composables for all
+* of the different sections in the main screen (Includes BreakingNewsScreen,
+* BreakingNewsListScreen, NewsArticleEntry, and the Chips for sorting news)
+* 
+ */
 
 @Composable
 fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit, viewModel: NewsViewModel = hiltViewModel()) {
@@ -188,21 +203,41 @@ fun ChipGroup(
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun SavedNewsListScreenWithSnackBar(
+    navController: NavController,
+    viewModel: NewsViewModel = hiltViewModel()
+){
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) {
+        SavedNewsListScreen(navController, snackbarHostState)
+    }
+
+}
 
 
 @Composable
-fun SavedNewsListScreen(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
+fun SavedNewsListScreen(navController: NavController, snackbarHostState: SnackbarHostState, viewModel: NewsViewModel = hiltViewModel()) {
 
     val savedNews by remember { viewModel.savedNews }
 
-    LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
+
+    LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/) {
 
         val itemCount = savedNews.size
 
         items(itemCount) {
             //no need to paginate as savedNews already contains all of the saved news from the Article database
             //so all is loaded at once
-            SavedNewsEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier)
+            SavedNewsEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier, snackbarHostState = snackbarHostState)
         }
     }
 }
@@ -213,10 +248,10 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
     val searchNews by remember { viewModel.searchNews }
     val isSearching by remember { viewModel.isSearching }
     val endReached by remember {  viewModel.endReached  }
-    val loadError by remember {  viewModel.loadError  }
+    //val loadError by remember {  viewModel.loadError  }
     val isLoading by remember {  viewModel.isLoading  }
 
-    LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/) {
+    LazyColumn() {
         val itemCount = searchNews.size
 
         items(itemCount) {
@@ -340,13 +375,20 @@ fun SavedNewsEntry(
     navController: NavController,
     rowIndex: Int,
     entry: List<Article>,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
+    val scope = rememberCoroutineScope()
+
     var delete = SwipeAction(
         onSwipe = {
-            viewModel.deleteArticle(entry[rowIndex])
+            val deletedArticle: Article = entry[rowIndex]
+            scope.launch {
+                snackbarHostState.showSnackbar("Snackbar oshfdhdf hdsfh sdf jsdfjhdfshdfshd sdhdfhhsdfh", duration = SnackbarDuration.Long)
+            }
+            //viewModel.deleteArticle(entry[rowIndex])
         },
         icon = {
             Icon(

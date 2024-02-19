@@ -7,6 +7,12 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+/* -------------------
+*
+* NewsAPI: This file contains all of the GET request Queries from the NewsAPI
+*
+* -------------------*/
+
 interface NewsAPI {
 
     @GET("v2/top-headlines")
