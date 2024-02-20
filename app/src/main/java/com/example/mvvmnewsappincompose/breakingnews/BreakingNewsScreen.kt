@@ -380,16 +380,23 @@ fun SavedNewsEntry(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    val scope = rememberCoroutineScope()
+    val deletedArticle by viewModel.articleDeleted.observeAsState()
+
+    LaunchedEffect(key1 = deletedArticle) {
+
+        if(deletedArticle == true){
+            snackbarHostState.showSnackbar("Article deleted", duration = SnackbarDuration.Long)
+            viewModel.updateArticleDeleted(false)
+        }
+
+    }
 
     var delete = SwipeAction(
         onSwipe = {
             val deletedArticle: Article = entry[rowIndex]
-            scope.launch {
-                snackbarHostState.showSnackbar("Snackbar oshfdhdf hdsfh sdf jsdfjhdfshdfshd sdhdfhhsdfh", duration = SnackbarDuration.Long)
-            }
-            //viewModel.deleteArticle(entry[rowIndex])
+            viewModel.deleteArticle(entry[rowIndex])
         },
+
         icon = {
             Icon(
                 Icons.Default.Delete,

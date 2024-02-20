@@ -67,6 +67,13 @@ class NewsViewModel @Inject constructor(
         _scrollToTop.postValue(scroll)
     }
 
+    private val _articleDeleted = MutableLiveData<Boolean>()
+    val articleDeleted: LiveData<Boolean> = _articleDeleted
+
+    fun updateArticleDeleted(deletion: Boolean) {
+        _articleDeleted.postValue(deletion)
+    }
+
     fun getBreakingNews(countryCode: String) {
         viewModelScope.launch {
             isLoading.value = true
@@ -262,8 +269,11 @@ class NewsViewModel @Inject constructor(
 
     }
 
-    fun deleteArticle(article: Article) = viewModelScope.launch {
-        newsRepository.deleteArticle(article)
+    fun deleteArticle(article: Article) {
+        viewModelScope.launch {
+            newsRepository.deleteArticle(article)
+            _articleDeleted.postValue(true)
+        }
     }
 
 
