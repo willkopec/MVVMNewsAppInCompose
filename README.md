@@ -39,7 +39,7 @@ Once the News App is installed and running, you can:
 
 ## Feedback
 
-We welcome any feedback or suggestions for improving the News App. Feel free to leave feedback or suggestions on what could be better in the issues
+All feedback or suggestions for improving the News App is welcome. Feel free to leave feedback/suggestions on what could be better in the issues section or feel free to send a PR.
 
 ## Images
 
