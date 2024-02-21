@@ -7,6 +7,7 @@ Welcome to the News App! This Android application provides a seamless experience
 - **Category-based News:** Explore news articles across different categories including Breaking, Economic, Sports, and more, providing comprehensive coverage of various topics.
 - **Save Articles:** Save your favorite news articles for later reference, ensuring you never miss important updates.
 - **Search Functionality:** Easily search for news articles using keywords, making it convenient to find specific information.
+- **Light/Dark Mode:** Switch between light and dark mode themes seamlessly with the tap of a button!
   
 ## Technologies Used
 
@@ -42,11 +43,10 @@ Once the News App is installed and running, you can:
 All feedback or suggestions for improving the News App is welcome. Feel free to leave feedback/suggestions on what could be better in the issues section or feel free to send a PR.
 
 ## Images
-
-![github1](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/b7037136-e6e6-43f4-86c4-064a856ee56c)
-![github2](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/9d2161dd-44e4-4e23-98c6-bfce3a076d74)
+![mvvmnewsDark1](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/0c94b212-120d-4083-99ba-325bea03b3ef)
+![mvvmnewsLight1](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/cd1d7928-7b29-4152-a822-1e98de51eabf)
 ![github3](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/a4548467-cedc-4a0d-b683-89f59921f86a)
-![github4](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/889f013f-f6c4-4543-a634-199316c4995c)
-![github5](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/d1ec9468-e069-4c2a-a562-63393c201ddb)
-![github7](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/088507fc-1352-43b7-aa6c-8f80e1f3b52e)
-![github6](https://github.com/willkopec/WealthWatchAndroidApp/assets/85149000/325f0b25-cc5c-4aee-bcfb-46136f0e953c)
+![mvvmsaveddark](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/03d10a53-0383-4c46-83ed-fac29237abbb)
+![mvvmsavedlight1](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/e2ea5ac7-c76a-4292-89bf-125f685a8d8d)
+![mvvmsearchdark](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/b13bb229-f1fc-4817-936b-af89c2217194)
+![mvvmsearchlight](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/a227319c-dd7d-4398-8817-5a6444c97b8f)
