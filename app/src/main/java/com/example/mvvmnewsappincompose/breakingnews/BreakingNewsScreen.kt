@@ -80,6 +80,7 @@ import java.net.URLEncoder
 fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit, viewModel: NewsViewModel = hiltViewModel()) {
 
     val currentSortType by remember { viewModel.currentSortType }
+    val currentNews by remember { viewModel.currentNews }
 
     Column {
 
@@ -88,19 +89,13 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
             selectedType = currentSortType,
             onSelectedChanged = {
                 viewModel.currentSortType.value = getSortType(it)
+                viewModel.updateCurrentNews()
                 viewModel.updateScrollToTop(true)
             }
         )
 
-        when(currentSortType){
-            SortType.BREAKING -> viewModel.currentNews = viewModel.breakingNews
-            SortType.ECONOMIC -> viewModel.currentNews = viewModel.economicNews
-            SortType.SPORTS -> viewModel.currentNews = viewModel.sportsNews
-            SortType.HEALTH -> viewModel.currentNews = viewModel.healthNews
-        }
-
         Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
-            BreakingNewsListScreen(viewModel.currentNews.value, navController)
+            BreakingNewsListScreen(currentNews, navController)
         }
     }
 

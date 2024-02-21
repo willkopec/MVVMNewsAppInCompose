@@ -59,6 +59,15 @@ class NewsViewModel @Inject constructor(
         getHealthNews()
     }
 
+    fun updateCurrentNews() {
+        currentNews.value = when (currentSortType.value) {
+            SortType.BREAKING -> breakingNews.value
+            SortType.ECONOMIC -> economicNews.value
+            SortType.SPORTS -> sportsNews.value
+            SortType.HEALTH -> healthNews.value
+        }
+    }
+
     private var _scrollToTop = MutableLiveData(false)
     val scrollToTop: LiveData<Boolean>
         get() = _scrollToTop
@@ -89,7 +98,9 @@ class NewsViewModel @Inject constructor(
 
                     breakingNewsPage++
                     breakingNews.value += breakingNewsArticles
-                    //currentNews.value += breakingNewsArticles
+                    if(currentNews.value.isEmpty()){
+                        currentNews.value += breakingNewsArticles
+                    }
                 }
                 is Resource.Error -> {
                     loadError.value = result.message!!
@@ -236,7 +247,7 @@ class NewsViewModel @Inject constructor(
 
     fun getSavedNews()  =
         newsRepository.getSavedNews().observeForever {
-            savedNews.value = emptyList()
+            //savedNews.value = emptyList()
             //currentNews.value = emptyList()
             savedNews.value += it
             //currentNews.value += it
