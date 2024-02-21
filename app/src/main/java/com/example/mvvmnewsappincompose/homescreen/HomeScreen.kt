@@ -89,7 +89,7 @@ fun HomeScreen(
                     title = {
                         Text(text = APP_NAME)
                     },
-                    navigationIcon = {
+                    actions = {
                         ThemeSwitcher(
                             darkTheme = darkTheme,
                             size = 50.dp,

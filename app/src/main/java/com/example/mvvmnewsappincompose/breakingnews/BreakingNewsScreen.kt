@@ -152,7 +152,7 @@ fun Chip(
     Surface(
         modifier = Modifier.padding(1.dp),
         shape = MaterialTheme.shapes.small,
-        color = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
     ) {
         Row(modifier = Modifier
             .toggleable(
