@@ -94,7 +94,7 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
             }
         )
 
-        Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
+        Surface(modifier = Modifier.fillMaxSize()) {
             BreakingNewsListScreen(currentNews, navController)
         }
     }
@@ -152,7 +152,7 @@ fun Chip(
     Surface(
         modifier = Modifier.padding(1.dp),
         shape = MaterialTheme.shapes.small,
-        color = if (isSelected) Color.DarkGray else MaterialTheme.colorScheme.primary
+        color = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.secondary
     ) {
         Row(modifier = Modifier
             .toggleable(
@@ -164,7 +164,7 @@ fun Chip(
         ) {
             Text(
                 text = name,
-                color = Color.White,
+                /*color = MaterialTheme.colorScheme.,*/
                 fontSize = 14.sp,
                 modifier = Modifier.padding(4.dp)
             )
@@ -182,7 +182,7 @@ fun ChipGroup(
 
     Column(modifier = Modifier
         .fillMaxWidth()
-        .background(color = Color.LightGray)
+        .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         LazyRow(modifier = Modifier) {
             items(chips) {
@@ -282,8 +282,7 @@ fun NewsArticleEntry(
 
     Column {
         Box(
-            modifier =
-            modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .shadow(1.dp, RoundedCornerShape(1.dp))
                 /*.padding(13.dp)*/

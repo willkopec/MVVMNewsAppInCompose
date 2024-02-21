@@ -43,6 +43,7 @@ class NewsViewModel @Inject constructor(
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
     var currentSnackBarMessage = mutableStateOf("")
+    var darkTheme = mutableStateOf(false)
 
     var breakingNewsPage = 1
     var searchNewsPage = 1
@@ -57,6 +58,10 @@ class NewsViewModel @Inject constructor(
         getEconomicNews()
         getSportsNews()
         getHealthNews()
+    }
+
+    fun switchDarkMode(){
+        darkTheme.value = !darkTheme.value
     }
 
     fun updateCurrentNews() {
