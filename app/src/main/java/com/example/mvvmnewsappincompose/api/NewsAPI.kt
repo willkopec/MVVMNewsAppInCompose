@@ -58,7 +58,7 @@ interface NewsAPI {
     @GET("v2/everything")
     suspend fun getHealthNews(
         @Query("q")
-        searchQuery: String = "health fitness gym sick",
+        searchQuery: String = "health fitness medicine",
         @Query("page")
         pageNumber :  Int = 1,
         @Query("apiKey")
