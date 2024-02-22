@@ -26,7 +26,7 @@ data class BottomNavigationItem(
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel:NewsViewModel by viewModels()
+    //private val viewModel:NewsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,34 +1,42 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.ConnectivityManager.TYPE_ETHERNET
+import android.net.ConnectivityManager.TYPE_MOBILE
+import android.net.ConnectivityManager.TYPE_WIFI
+import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
+import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
+import android.net.NetworkCapabilities.TRANSPORT_WIFI
+import android.os.Build
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mvvmnewsappincompose.MainActivity
+import com.example.mvvmnewsappincompose.MyPreference
+import com.example.mvvmnewsappincompose.NewsApplication
 import com.example.mvvmnewsappincompose.SortType
 import com.example.mvvmnewsappincompose.getAllTypes
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
-import kotlin.math.log
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewsViewModel @Inject constructor(
-    val newsRepository : NewsRepository
+    val newsRepository : NewsRepository,
+    val myPreference: MyPreference,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     var isLoading = mutableStateOf(true)
@@ -43,7 +51,7 @@ class NewsViewModel @Inject constructor(
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
     var currentSnackBarMessage = mutableStateOf("")
-    var darkTheme = mutableStateOf(false)
+    var darkTheme = mutableStateOf(myPreference.isDarkMode())
 
     var breakingNewsPage = 1
     var searchNewsPage = 1
@@ -60,17 +68,24 @@ class NewsViewModel @Inject constructor(
         getHealthNews()
     }
 
-    fun switchDarkMode(){
-        darkTheme.value = !darkTheme.value
+
+    fun switchDarkMode() {
+        val newValue = !darkTheme.value
+        darkTheme.value = newValue
+        // Save the new value in SharedPreferences
+        viewModelScope.launch {
+            myPreference.switchDarkMode()
+        }
     }
 
     fun updateCurrentNews() {
-        currentNews.value = when (currentSortType.value) {
-            SortType.BREAKING -> breakingNews.value
-            SortType.ECONOMIC -> economicNews.value
-            SortType.SPORTS -> sportsNews.value
-            SortType.HEALTH -> healthNews.value
-        }
+        currentNews.value =
+            when (currentSortType.value) {
+                SortType.BREAKING -> breakingNews.value
+                SortType.ECONOMIC -> economicNews.value
+                SortType.SPORTS -> sportsNews.value
+                SortType.HEALTH -> healthNews.value
+            }
     }
 
     private var _scrollToTop = MutableLiveData(false)
@@ -91,7 +106,7 @@ class NewsViewModel @Inject constructor(
     fun getBreakingNews(countryCode: String) {
         viewModelScope.launch {
             isLoading.value = true
-            //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
+            //var result = (PAGE_SIZE, curPage * PAGE_SIZE)
             var result = newsRepository.getBreakingNews("us", breakingNewsPage)
             Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news size: ${breakingNews.value.size}")
             when(result) {
@@ -122,7 +137,7 @@ class NewsViewModel @Inject constructor(
     fun getEconomicNews() {
         viewModelScope.launch {
             isLoading.value = true
-            //var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
+            //var result = (PAGE_SIZE, curPage * PAGE_SIZE)
             var result = newsRepository.getEconomicNews()
             when(result) {
                 is Resource.Success -> {
@@ -200,7 +215,6 @@ class NewsViewModel @Inject constructor(
 
     }
 
-
     fun searchNews(query: String){
 
             viewModelScope.launch(Dispatchers.Default) {
@@ -254,14 +268,17 @@ class NewsViewModel @Inject constructor(
         newsRepository.getSavedNews().observeForever {
             //savedNews.value = emptyList()
             //currentNews.value = emptyList()
-            savedNews.value += it
+            savedNews.value = it
             //currentNews.value += it
         }
 
     private fun hasInternetConnection(): Boolean {
-        /*val connectivityManager = getApplication<NewsApplication>().getSystemService(
+        /*val connectivityManager = getApplication()//getApplication.getSystemService(
             Context.CONNECTIVITY_SERVICE
-        ) as ConnectivityManager
+        ) as ConnectivityManager*/
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             val activeNetwork = connectivityManager.activeNetwork ?: return false
             val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
@@ -280,7 +297,7 @@ class NewsViewModel @Inject constructor(
                     else -> false
                 }
             }
-        }*/
+        }
         return true
 
     }
@@ -291,9 +308,6 @@ class NewsViewModel @Inject constructor(
             _articleDeleted.postValue(true)
         }
     }
-
-
-
     /*private fun handleBreakingNewsResponse(response: Response<NewsResponse>) : Resource<NewsResponse> {
         if(response.isSuccessful) {
             response.body()?.let {resultResponse ->

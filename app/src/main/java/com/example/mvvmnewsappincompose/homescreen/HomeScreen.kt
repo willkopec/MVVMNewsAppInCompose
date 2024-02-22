@@ -2,6 +2,7 @@ package com.example.mvvmnewsappincompose.homescreen
 
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -44,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +67,7 @@ import com.example.mvvmnewsappincompose.breakingnews.NewsViewModel
 import com.example.mvvmnewsappincompose.ui.theme.MVVMNewsAppInComposeTheme
 import com.example.mvvmnewsappincompose.util.BottomBarScreen
 import com.example.mvvmnewsappincompose.util.Constants.Companion.APP_NAME
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
