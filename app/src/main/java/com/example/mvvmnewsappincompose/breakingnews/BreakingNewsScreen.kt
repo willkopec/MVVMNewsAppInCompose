@@ -3,27 +3,21 @@ package com.example.mvvmnewsappincompose.breakingnews
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,6 +27,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -42,23 +37,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.wear.compose.material.ExperimentalWearMaterialApi
+import androidx.wear.compose.material.FractionalThreshold
+import androidx.wear.compose.material.rememberSwipeableState
+import androidx.wear.compose.material.swipeable
 import coil.compose.SubcomposeAsyncImage
 import com.example.mvvmnewsappincompose.SortType
+import com.example.mvvmnewsappincompose.SwipeDirection
 import com.example.mvvmnewsappincompose.getAllTypes
 import com.example.mvvmnewsappincompose.getSortType
 import com.example.mvvmnewsappincompose.homescreen.RetrySection
@@ -68,6 +73,7 @@ import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 import java.net.URLEncoder
+import kotlin.math.roundToInt
 
 /*
 *
@@ -226,7 +232,7 @@ fun SavedNewsListScreenWithSnackBar(
 @Composable
 fun SavedNewsListScreen(navController: NavController, snackbarHostState: SnackbarHostState, viewModel: NewsViewModel = hiltViewModel()) {
 
-    val savedNews by remember { viewModel.savedNews }
+    val savedNews = remember { viewModel.savedNews }
 
 
     LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/) {
@@ -250,7 +256,9 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
     //val loadError by remember {  viewModel.loadError  }
     val isLoading by remember {  viewModel.isLoading  }
 
-    if(searchNews.size == 0 && isSearching){
+    val itemCount = searchNews.size
+
+    if(itemCount == 0 && isSearching) {
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -261,7 +269,7 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
     } else {
 
         LazyColumn() {
-            val itemCount = searchNews.size
+
 
             items(itemCount) {
                 //if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
@@ -319,7 +327,7 @@ fun NewsArticleEntry(
                         modifier = Modifier
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(5.dp)),
-                        loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
+                        //loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
                     )
                 }
             }
@@ -381,6 +389,7 @@ fun NewsArticleEntry(
     }
 }
 
+@OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun SavedNewsEntry(
     navController: NavController,
@@ -402,40 +411,76 @@ fun SavedNewsEntry(
 
     }
 
-    var delete = SwipeAction(
-        onSwipe = {
-            val deletedArticle: Article = entry[rowIndex]
-            viewModel.deleteArticle(entry[rowIndex])
-        },
-
-        icon = {
-            Icon(
-                Icons.Default.Delete,
-                contentDescription = "Delete chat",
-                modifier = Modifier.padding(16.dp),
-                tint = Color.White
-            )
-        },
-        background = Color.Red.copy(alpha = 0.5f),
-        isUndo = true
-    )
-
     val moshi = Moshi.Builder().build()
     val jsonAdapter = moshi.adapter(Article::class.java).lenient()
     val currentArticle = jsonAdapter.toJson(entry[rowIndex])
 
+    val squareSize = 48.dp
+    val swipeableState = rememberSwipeableState(SwipeDirection.Initial)
+    val density = LocalDensity.current
+    var size by remember { mutableStateOf(Size.Zero) }
+    val width = remember(size) {
+        if (size.width == 0f) {
+            1f
+        } else {
+            size.width - with(density) { squareSize.toPx() }
+        }
+    }
+
+    val scope = rememberCoroutineScope()
+
+    if (swipeableState.isAnimationRunning) {
+        DisposableEffect(Unit) {
+            onDispose {
+                when (swipeableState.currentValue) {
+                    SwipeDirection.Right -> {
+                        println("swipe right")
+                    }
+                    SwipeDirection.Left -> {
+                        println("swipe left")
+                    }
+                    else -> {
+                        return@onDispose
+                    }
+                }
+                scope.launch {
+                    // in your real app if you don't have to display offset,
+                    // snap without animation
+                    swipeableState.snapTo(SwipeDirection.Initial)
+                    viewModel.deleteArticle(entry[rowIndex])
+                }
+            }
+        }
+    }
+
     Column {
-        SwipeableActionsBox(
-            modifier = modifier
+        Box(
+            modifier = Modifier
                 .fillMaxWidth()
-                .shadow(1.dp, RoundedCornerShape(1.dp))
-                /*.padding(13.dp)*/
+                .onSizeChanged { size = Size(it.width.toFloat(), it.height.toFloat()) }
+                .swipeable(
+                    state = swipeableState,
+                    anchors = mapOf(
+                        -1 * (width / 2) to SwipeDirection.Left,
+                        0f to SwipeDirection.Initial,
+                        width / 2 to SwipeDirection.Right,
+                    ),
+                    thresholds = { _, _ -> FractionalThreshold(0.55f) },
+                    orientation = Orientation.Horizontal,
+                )
+                .background(Color.LightGray)
+        ) {
+
+        Box(
+            Modifier
+                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                //.shadow(1.dp, RoundedCornerShape(1.dp))
+                .fillMaxWidth()
+                .background(Color.DarkGray)
                 .clickable {
                     val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
                     navController.navigate("saved_news/$encodedUrl")
-                },
-            swipeThreshold = 100.dp,
-            endActions = listOf(delete)
+                }
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(0.3f)
@@ -446,7 +491,7 @@ fun SavedNewsEntry(
                         model = entry[rowIndex].urlToImage,
                         contentDescription = null,
                         modifier = Modifier.fillMaxHeight(),
-                        loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
+                        //loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
                     )
                 }
             }
@@ -456,10 +501,10 @@ fun SavedNewsEntry(
             if (entry[rowIndex].urlToImage == null) {
                 modifierForText = Modifier.fillMaxWidth()
             } else {
-                modifierForText = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopEnd)
-                    .padding(start = 150.dp)
+            modifierForText = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopEnd)
+                .padding(start = 150.dp)
             }
 
             Row(modifier = modifierForText) {
@@ -505,4 +550,5 @@ fun SavedNewsEntry(
             }
         }
     }
+}
 }

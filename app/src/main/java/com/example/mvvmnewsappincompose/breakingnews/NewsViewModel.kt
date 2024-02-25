@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
 import android.net.NetworkCapabilities.TRANSPORT_WIFI
 import android.os.Build
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LiveData
@@ -30,6 +31,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import java.util.Collections.addAll
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,7 +50,7 @@ class NewsViewModel @Inject constructor(
     var economicNews = mutableStateOf<List<Article>>(listOf())
     var sportsNews = mutableStateOf<List<Article>>(listOf())
     var healthNews = mutableStateOf<List<Article>>(listOf())
-    var savedNews = mutableStateOf<List<Article>>(emptyList())
+    var savedNews = mutableStateListOf<Article>()
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
     var darkTheme = mutableStateOf(myPreference.isDarkMode())
@@ -292,9 +294,9 @@ class NewsViewModel @Inject constructor(
 
     fun getSavedNews()  =
         newsRepository.getSavedNews().observeForever {
-            //savedNews.value = emptyList()
             //currentNews.value = emptyList()
-            savedNews.value = it
+            savedNews.clear()
+            savedNews.apply { addAll(it) }
             //currentNews.value += it
         }
 
