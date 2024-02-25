@@ -50,4 +50,5 @@ All feedback or suggestions for improving the News App is welcome. Feel free to 
 ![mvvmsavedlight1](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/e2ea5ac7-c76a-4292-89bf-125f685a8d8d)
 ![mvvmsearchdark](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/b13bb229-f1fc-4817-936b-af89c2217194)
 ![mvvmsearchlight](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/a227319c-dd7d-4398-8817-5a6444c97b8f)
+### Application when there is no Internet Connection:
 ![news app no connection](https://github.com/willkopec/MVVMNewsAppInCompose/assets/85149000/81d9f472-6a58-4cb3-9263-76aeac753ee2)
