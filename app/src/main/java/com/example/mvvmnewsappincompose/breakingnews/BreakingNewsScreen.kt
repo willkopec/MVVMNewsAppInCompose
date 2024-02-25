@@ -61,6 +61,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.mvvmnewsappincompose.SortType
 import com.example.mvvmnewsappincompose.getAllTypes
 import com.example.mvvmnewsappincompose.getSortType
+import com.example.mvvmnewsappincompose.homescreen.RetrySection
 import com.example.mvvmnewsappincompose.models.Article
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.launch
@@ -80,7 +81,6 @@ import java.net.URLEncoder
 fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit, viewModel: NewsViewModel = hiltViewModel()) {
 
     val currentSortType by remember { viewModel.currentSortType }
-    val currentNews by remember { viewModel.currentNews }
 
     Column {
 
@@ -95,7 +95,7 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
         )
 
         Surface(modifier = Modifier.fillMaxSize()) {
-            BreakingNewsListScreen(currentNews, navController)
+            BreakingNewsListScreen(navController)
         }
     }
 
@@ -103,13 +103,14 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
 
 @Composable
 fun BreakingNewsListScreen(
-    currentNewsList: List<Article>,
     navController: NavController,
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
     val scrollState = rememberLazyListState()
     val scrollToTop by viewModel.scrollToTop.observeAsState()
+    val currentNews by remember { viewModel.currentNews }
+    val loadError by remember { viewModel.loadError }
 
     LaunchedEffect(
         key1 = scrollToTop,
@@ -120,27 +121,30 @@ fun BreakingNewsListScreen(
         }
     }
 
-    LazyColumn (state = scrollState){
+    if(loadError == ""){
+        LazyColumn (state = scrollState){
 
-        val itemCount = currentNewsList.size
+            val itemCount = currentNews.size
 
-        items(itemCount) {
+            items(itemCount) {
 
-            //if (it >= itemCount - 1) {
+                NewsArticleEntry(
+                    navController,
+                    rowIndex = it,
+                    entry = currentNews,
+                    modifier = Modifier
+                )
 
-                //LaunchedEffect(key1 = true) { viewModel.getBreakingNews("us") }
-            //}
-
-            NewsArticleEntry(
-                navController,
-                rowIndex = it,
-                entry = currentNewsList,
-                modifier = Modifier
-            )
+            }
 
         }
-
+    } else {
+        RetrySection(error = loadError) {
+            viewModel.getAllNewsLists()
+        }
     }
+
+
 }
 
 @Composable
@@ -256,12 +260,20 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
 
             }
 
-            NewsArticleEntry(
-                navController,
-                rowIndex = it,
-                entry = searchNews,
-                modifier = Modifier
-            )
+            if(itemCount > 0){
+                NewsArticleEntry(
+                    navController,
+                    rowIndex = it,
+                    entry = searchNews,
+                    modifier = Modifier
+                )
+            } else {
+                Text(
+                    text = "No Results have been found!",
+                    textAlign = TextAlign.Center
+                )
+            }
+
         }
 
     }

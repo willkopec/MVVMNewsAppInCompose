@@ -50,7 +50,6 @@ class NewsViewModel @Inject constructor(
     var savedNews = mutableStateOf<List<Article>>(emptyList())
     var searchNews = mutableStateOf<List<Article>>(listOf())
     var isSearching = mutableStateOf(false)
-    var currentSnackBarMessage = mutableStateOf("")
     var darkTheme = mutableStateOf(myPreference.isDarkMode())
 
     var breakingNewsPage = 1
@@ -61,11 +60,24 @@ class NewsViewModel @Inject constructor(
     var currentSortType = mutableStateOf(getAllTypes()[0])
 
     init {
+        getAllNewsLists()
+    }
+
+    fun getAllNewsLists(){
         getBreakingNews("us")
         getSavedNews()
         getEconomicNews()
         getSportsNews()
         getHealthNews()
+
+        if(loadError.value.isNotEmpty()){
+            breakingNewsPage = 1
+        }
+
+        Log.d("GetAllNews Function", "LoadError : ${loadError.value} Breaking news size: ${breakingNews.value.size}")
+
+        isLoading.value = loadError.value.isNotEmpty()
+        loadError.value = ""
     }
 
 
@@ -108,7 +120,7 @@ class NewsViewModel @Inject constructor(
             isLoading.value = true
             //var result = (PAGE_SIZE, curPage * PAGE_SIZE)
             var result = newsRepository.getBreakingNews("us", breakingNewsPage)
-            Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news size: ${breakingNews.value.size}")
+            //Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news size: ${breakingNews.value.size}")
             when(result) {
                 is Resource.Success -> {
 
@@ -116,6 +128,9 @@ class NewsViewModel @Inject constructor(
                         Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
                     }
 
+                    Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news size: ${result.data?.articles!!.size}")
+                    //loadError.value = ""
+                    //isLoading.value = false
                     breakingNewsPage++
                     breakingNews.value += breakingNewsArticles
                     if(currentNews.value.isEmpty()){
@@ -146,7 +161,9 @@ class NewsViewModel @Inject constructor(
                         Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
                     }
 
-                    breakingNewsPage++
+                    //loadError.value = ""
+                    //isLoading.value = false
+                    //breakingNewsPage++
                     economicNews.value += economicNewsArticles
                 }
                 is Resource.Error -> {
@@ -173,7 +190,9 @@ class NewsViewModel @Inject constructor(
                         Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
                     }
 
-                    breakingNewsPage++
+                    //breakingNewsPage++
+                    //loadError.value = ""
+                    //isLoading.value = false
                     sportsNews.value += sportsNewsArticles
                 }
                 is Resource.Error -> {
@@ -200,7 +219,9 @@ class NewsViewModel @Inject constructor(
                         Article(article.author,article.content,article.description, article.publishedAt, article.source, article.title, article.url, article.urlToImage)
                     }
 
-                    breakingNewsPage++
+                    //loadError.value = ""
+                    //isLoading.value = false
+                    //breakingNewsPage++
                     healthNews.value += healthNewsArticles
                 }
                 is Resource.Error -> {
@@ -251,6 +272,8 @@ class NewsViewModel @Inject constructor(
                     is Resource.Loading -> {
 
                     }
+
+                    else -> {}
                 }
 
             }
