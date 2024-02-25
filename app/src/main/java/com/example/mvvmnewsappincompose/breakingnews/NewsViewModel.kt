@@ -20,6 +20,7 @@ import com.example.mvvmnewsappincompose.MyPreference
 import com.example.mvvmnewsappincompose.NewsApplication
 import com.example.mvvmnewsappincompose.SortType
 import com.example.mvvmnewsappincompose.getAllTypes
+import com.example.mvvmnewsappincompose.getSortType
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
@@ -57,7 +58,7 @@ class NewsViewModel @Inject constructor(
 
     private var isSearchStarting = true
 
-    var currentSortType = mutableStateOf(getAllTypes()[0])
+    var currentSortType = mutableStateOf(SortType.BREAKING)
 
     init {
         getAllNewsLists()
@@ -78,6 +79,7 @@ class NewsViewModel @Inject constructor(
 
         isLoading.value = loadError.value.isNotEmpty()
         loadError.value = ""
+        updateCurrentNews()
     }
 
 
@@ -129,8 +131,8 @@ class NewsViewModel @Inject constructor(
                     }
 
                     Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news size: ${result.data?.articles!!.size}")
-                    //loadError.value = ""
-                    //isLoading.value = false
+                    loadError.value = ""
+                    isLoading.value = false
                     breakingNewsPage++
                     breakingNews.value += breakingNewsArticles
                     if(currentNews.value.isEmpty()){
@@ -254,6 +256,7 @@ class NewsViewModel @Inject constructor(
 
                 when(result) {
                     is Resource.Success -> {
+                        isSearching.value = true
                         endReached.value = searchNewsPage * 20 >= result.data!!.articles.size
                         val searchNewsResults = result.data!!.articles.mapIndexed { index, entry ->
                             Article(entry.author,entry.content,entry.description, entry.publishedAt, entry.source, entry.title, entry.url, entry.urlToImage)

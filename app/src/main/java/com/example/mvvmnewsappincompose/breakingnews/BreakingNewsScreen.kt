@@ -250,33 +250,38 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
     //val loadError by remember {  viewModel.loadError  }
     val isLoading by remember {  viewModel.isLoading  }
 
-    LazyColumn() {
-        val itemCount = searchNews.size
+    if(searchNews.size == 0 && isSearching){
 
-        items(itemCount) {
-            if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "No Results Found!",
+                textAlign = TextAlign.Center
+            )
 
-                //LaunchedEffect(key1 = true) { viewModel.searchNews("") }
+    } else {
 
-            }
+        LazyColumn() {
+            val itemCount = searchNews.size
 
-            if(itemCount > 0){
+            items(itemCount) {
+                //if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
+
+                    //LaunchedEffect(key1 = true) { viewModel.searchNews("") }
+
+                //}
+
                 NewsArticleEntry(
                     navController,
                     rowIndex = it,
                     entry = searchNews,
                     modifier = Modifier
                 )
-            } else {
-                Text(
-                    text = "No Results have been found!",
-                    textAlign = TextAlign.Center
-                )
+
             }
 
         }
-
     }
+
 }
 
 @Composable

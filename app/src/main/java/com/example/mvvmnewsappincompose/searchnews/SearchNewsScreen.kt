@@ -121,7 +121,7 @@ fun SearchBar(
     }
 
     LaunchedEffect(key1 = text) {
-        if (text.isBlank()) return@LaunchedEffect
+        //if (text.isBlank()) return@LaunchedEffect
         delay(750)  // the delay of 3 seconds
         viewModel.searchNews(text)
     }
