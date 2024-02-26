@@ -48,18 +48,10 @@ fun SearchNewsScreen(
 ) {
 
     Surface(
-        //color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
     ) {
 
         Column {
-            /*Spacer(modifier = Modifier.height(20.dp))
-            Image(painter = painterResource(id = R.drawable.ic_international_pok_mon_logo),
-                contentDescription = "Pokemon",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally)
-            )*/
             SearchBar(
                 hint = "Search...",
                 modifier = Modifier
@@ -67,7 +59,6 @@ fun SearchNewsScreen(
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(16.dp)
             )
-            //Spacer(modifier = Modifier.height(16.dp))
             SearchNewsResults(navController = navController)
         }
 

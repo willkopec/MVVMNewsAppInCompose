@@ -1,6 +1,8 @@
 package com.example.mvvmnewsappincompose.homescreen
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,6 +29,9 @@ import com.squareup.moshi.Moshi
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
     NavHost(
         navController = navController,
         route = Graph.HOME,

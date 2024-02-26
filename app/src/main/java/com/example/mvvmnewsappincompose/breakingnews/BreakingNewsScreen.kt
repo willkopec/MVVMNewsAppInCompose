@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -29,34 +28,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.FractionalThreshold
 import androidx.wear.compose.material.rememberSwipeableState
@@ -69,27 +60,30 @@ import com.example.mvvmnewsappincompose.getSortType
 import com.example.mvvmnewsappincompose.homescreen.RetrySection
 import com.example.mvvmnewsappincompose.models.Article
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.launch
-import me.saket.swipe.SwipeAction
-import me.saket.swipe.SwipeableActionsBox
+import kotlinx.coroutines.delay
 import java.net.URLEncoder
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 /*
-*
-* BreakingNewsScreen: This file contains all of the needed composables for all
-* of the different sections in the main screen (Includes BreakingNewsScreen,
-* BreakingNewsListScreen, NewsArticleEntry, and the Chips for sorting news)
-* 
+ *
+ * BreakingNewsScreen: This file contains all of the needed composables for all
+ * of the different sections in the main screen (Includes BreakingNewsScreen,
+ * BreakingNewsListScreen, NewsArticleEntry, and the Chips for sorting news)
+ *
  */
 
 @Composable
-fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -> Unit, viewModel: NewsViewModel = hiltViewModel()) {
+fun BreakingNewsScreen(
+    navController: NavController,
+    name: String,
+    onClick: () -> Unit,
+    viewModel: NewsViewModel = hiltViewModel()
+) {
 
     val currentSortType by remember { viewModel.currentSortType }
 
     Column {
-
         ChipGroup(
             chips = getAllTypes(),
             selectedType = currentSortType,
@@ -100,11 +94,8 @@ fun BreakingNewsScreen(navController: NavController, name: String, onClick: () -
             }
         )
 
-        Surface(modifier = Modifier.fillMaxSize()) {
-            BreakingNewsListScreen(navController)
-        }
+        Surface(modifier = Modifier.fillMaxSize()) { BreakingNewsListScreen(navController) }
     }
-
 }
 
 @Composable
@@ -127,30 +118,22 @@ fun BreakingNewsListScreen(
         }
     }
 
-    if(loadError == ""){
-        LazyColumn (state = scrollState){
-
+    if (loadError == "") {
+        LazyColumn(state = scrollState) {
             val itemCount = currentNews.size
 
             items(itemCount) {
-
                 NewsArticleEntry(
                     navController,
                     rowIndex = it,
                     entry = currentNews,
                     modifier = Modifier
                 )
-
             }
-
         }
     } else {
-        RetrySection(error = loadError) {
-            viewModel.getAllNewsLists()
-        }
+        RetrySection(error = loadError) { viewModel.getAllNewsLists() }
     }
-
-
 }
 
 @Composable
@@ -162,14 +145,15 @@ fun Chip(
     Surface(
         modifier = Modifier.padding(1.dp),
         shape = MaterialTheme.shapes.small,
-        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+        color =
+        if (isSelected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.secondary
     ) {
-        Row(modifier = Modifier
-            .toggleable(
+        Row(
+            modifier =
+            Modifier.toggleable(
                 value = isSelected,
-                onValueChange = {
-                    onSelectionChanged(name)
-                }
+                onValueChange = { onSelectionChanged(name) }
             )
         ) {
             Text(
@@ -190,18 +174,16 @@ fun ChipGroup(
     onSelectedChanged: (String) -> Unit = {},
 ) {
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(color = MaterialTheme.colorScheme.primaryContainer)
+    Column(
+        modifier =
+        Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         LazyRow(modifier = Modifier) {
             items(chips) {
                 Chip(
                     name = it.value,
                     isSelected = selectedType == it,
-                    onSelectionChanged = {
-                        onSelectedChanged(it)
-                    },
+                    onSelectionChanged = { onSelectedChanged(it) },
                 )
             }
         }
@@ -213,36 +195,39 @@ fun ChipGroup(
 fun SavedNewsListScreenWithSnackBar(
     navController: NavController,
     viewModel: NewsViewModel = hiltViewModel()
-){
+) {
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
-    ) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         SavedNewsListScreen(navController, snackbarHostState)
     }
-
 }
 
-
 @Composable
-fun SavedNewsListScreen(navController: NavController, snackbarHostState: SnackbarHostState, viewModel: NewsViewModel = hiltViewModel()) {
+fun SavedNewsListScreen(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    viewModel: NewsViewModel = hiltViewModel()
+) {
 
     val savedNews = remember { viewModel.savedNews }
 
-
-    LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/) {
-
+    LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/ ) {
         val itemCount = savedNews.size
 
         items(itemCount) {
-            //no need to paginate as savedNews already contains all of the saved news from the Article database
-            //so all is loaded at once
-            SavedNewsEntry(navController, rowIndex = it, entry = savedNews, modifier = Modifier, snackbarHostState = snackbarHostState)
+            // no need to paginate as savedNews already contains all of the saved news from the
+            // Article database
+            // so all is loaded at once
+            SavedNewsEntry(
+                navController,
+                rowIndex = it,
+                entry = savedNews,
+                modifier = Modifier,
+                snackbarHostState = snackbarHostState
+            )
         }
     }
 }
@@ -252,31 +237,28 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
 
     val searchNews by remember { viewModel.searchNews }
     val isSearching by remember { viewModel.isSearching }
-    val endReached by remember {  viewModel.endReached  }
-    //val loadError by remember {  viewModel.loadError  }
-    val isLoading by remember {  viewModel.isLoading  }
+    val endReached by remember { viewModel.endReached }
+    // val loadError by remember {  viewModel.loadError  }
+    val isLoading by remember { viewModel.isLoading }
 
     val itemCount = searchNews.size
 
-    if(itemCount == 0 && isSearching) {
+    if (itemCount == 0 && isSearching) {
 
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "No Results Found!",
-                textAlign = TextAlign.Center
-            )
-
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "No Results Found!",
+            textAlign = TextAlign.Center
+        )
     } else {
 
         LazyColumn() {
-
-
             items(itemCount) {
-                //if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
+                // if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
 
-                    //LaunchedEffect(key1 = true) { viewModel.searchNews("") }
+                // LaunchedEffect(key1 = true) { viewModel.searchNews("") }
 
-                //}
+                // }
 
                 NewsArticleEntry(
                     navController,
@@ -284,12 +266,9 @@ fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = h
                     entry = searchNews,
                     modifier = Modifier
                 )
-
             }
-
         }
     }
-
 }
 
 @Composable
@@ -307,8 +286,8 @@ fun NewsArticleEntry(
 
     Column {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+            Modifier.fillMaxWidth()
                 .shadow(1.dp, RoundedCornerShape(1.dp))
                 /*.padding(13.dp)*/
                 .clickable {
@@ -324,10 +303,8 @@ fun NewsArticleEntry(
                     SubcomposeAsyncImage(
                         model = entry[rowIndex].urlToImage,
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(5.dp)),
-                        //loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
+                        modifier = Modifier.fillMaxHeight().clip(RoundedCornerShape(5.dp)),
+                        // loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
                     )
                 }
             }
@@ -335,13 +312,9 @@ fun NewsArticleEntry(
             val modifierForText: Modifier
 
             if (entry[rowIndex].urlToImage == null) {
-                modifierForText = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.Center)
+                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.Center)
             } else {
-                modifierForText = Modifier
-                    .fillMaxWidth(0.7f)
-                    .align(Alignment.TopEnd)
+                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.TopEnd)
             }
 
             Row(modifier = modifierForText) {
@@ -403,12 +376,9 @@ fun SavedNewsEntry(
     val deletedArticle by viewModel.articleDeleted.observeAsState()
 
     LaunchedEffect(key1 = deletedArticle) {
-
-        if(deletedArticle == true){
-            snackbarHostState.showSnackbar("Article deleted", duration = SnackbarDuration.Long)
+        if (deletedArticle == true) {
             viewModel.updateArticleDeleted(false)
         }
-
     }
 
     val moshi = Moshi.Builder().build()
@@ -419,13 +389,14 @@ fun SavedNewsEntry(
     val swipeableState = rememberSwipeableState(SwipeDirection.Initial)
     val density = LocalDensity.current
     var size by remember { mutableStateOf(Size.Zero) }
-    val width = remember(size) {
-        if (size.width == 0f) {
-            1f
-        } else {
-            size.width - with(density) { squareSize.toPx() }
+    val width =
+        remember(size) {
+            if (size.width == 0f) {
+                1f
+            } else {
+                size.width - with(density) { squareSize.toPx() }
+            }
         }
-    }
 
     val scope = rememberCoroutineScope()
 
@@ -434,10 +405,10 @@ fun SavedNewsEntry(
             onDispose {
                 when (swipeableState.currentValue) {
                     SwipeDirection.Right -> {
-                        println("swipe right")
+                        viewModel.deleteArticle(entry[rowIndex])
                     }
                     SwipeDirection.Left -> {
-                        println("swipe left")
+                        viewModel.deleteArticle(entry[rowIndex])
                     }
                     else -> {
                         return@onDispose
@@ -447,7 +418,7 @@ fun SavedNewsEntry(
                     // in your real app if you don't have to display offset,
                     // snap without animation
                     swipeableState.snapTo(SwipeDirection.Initial)
-                    viewModel.deleteArticle(entry[rowIndex])
+                    snackbarHostState.showSnackbar("Article deleted", duration = SnackbarDuration.Short)
                 }
             }
         }
@@ -455,12 +426,13 @@ fun SavedNewsEntry(
 
     Column {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier =
+            Modifier.fillMaxWidth()
                 .onSizeChanged { size = Size(it.width.toFloat(), it.height.toFloat()) }
                 .swipeable(
                     state = swipeableState,
-                    anchors = mapOf(
+                    anchors =
+                    mapOf(
                         -1 * (width / 2) to SwipeDirection.Left,
                         0f to SwipeDirection.Initial,
                         width / 2 to SwipeDirection.Right,
@@ -468,81 +440,77 @@ fun SavedNewsEntry(
                     thresholds = { _, _ -> FractionalThreshold(0.55f) },
                     orientation = Orientation.Horizontal,
                 )
-                .background(Color.LightGray)
         ) {
-
-        Box(
-            Modifier
-                .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                //.shadow(1.dp, RoundedCornerShape(1.dp))
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .clickable {
-                    val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
-                    navController.navigate("saved_news/$encodedUrl")
-                }
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(0.3f)
-                /*.align(Alignment.TopStart)*/
+            Box(
+                Modifier.offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                    .shadow(1.dp, RoundedCornerShape(1.dp))
+                    .fillMaxWidth()
+                    .clickable {
+                        val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
+                        navController.navigate("saved_news/$encodedUrl")
+                    }
             ) {
-                Column {
-                    SubcomposeAsyncImage(
-                        model = entry[rowIndex].urlToImage,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxHeight(),
-                        //loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.3f)
+                    /*.align(Alignment.TopStart)*/
+                ) {
+                    Column {
+                        SubcomposeAsyncImage(
+                            model = entry[rowIndex].urlToImage,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxHeight(),
+                            // loading = { CircularProgressIndicator(modifier =
+                            // Modifier.scale(0.5f)) }
+                        )
+                    }
                 }
-            }
 
-            val modifierForText: Modifier
+                val modifierForText: Modifier
 
-            if (entry[rowIndex].urlToImage == null) {
-                modifierForText = Modifier.fillMaxWidth()
-            } else {
-            modifierForText = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopEnd)
-                .padding(start = 150.dp)
-            }
+                if (entry[rowIndex].urlToImage == null) {
+                    modifierForText = Modifier.fillMaxWidth()
+                } else {
+                    modifierForText =
+                        Modifier.fillMaxWidth().align(Alignment.TopEnd).padding(start = 150.dp)
+                }
 
-            Row(modifier = modifierForText) {
-                Column {
-                    if (entry[rowIndex].title != "[Removed]") {
-                        entry[rowIndex].title?.let { it1 ->
-                            Text(
-                                text = it1.replace('+', ' '),
-                                fontSize = 12.sp,
-                                fontWeight = Bold,
-                                lineHeight = 15.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                                maxLines = 2
-                            )
-                        }
-
-                        if (entry[rowIndex].description != null) {
-                            entry[rowIndex].description?.let { it1 ->
-                                Text(
-                                    text = it1.replace('+', ' '),
-                                    fontSize = 10.sp,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = 12.sp,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    maxLines = 4
-                                )
-                            }
-                        } else {
+                Row(modifier = modifierForText) {
+                    Column {
+                        if (entry[rowIndex].title != "[Removed]") {
                             entry[rowIndex].title?.let { it1 ->
                                 Text(
                                     text = it1.replace('+', ' '),
-                                    fontSize = 9.sp,
+                                    fontSize = 12.sp,
+                                    fontWeight = Bold,
+                                    lineHeight = 15.sp,
                                     textAlign = TextAlign.Center,
-                                    lineHeight = 11.sp,
                                     modifier = Modifier.fillMaxWidth(),
-                                    maxLines = 4
+                                    maxLines = 2
                                 )
+                            }
+
+                            if (entry[rowIndex].description != null) {
+                                entry[rowIndex].description?.let { it1 ->
+                                    Text(
+                                        text = it1.replace('+', ' '),
+                                        fontSize = 10.sp,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 12.sp,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        maxLines = 4
+                                    )
+                                }
+                            } else {
+                                entry[rowIndex].title?.let { it1 ->
+                                    Text(
+                                        text = it1.replace('+', ' '),
+                                        fontSize = 9.sp,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 11.sp,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        maxLines = 4
+                                    )
+                                }
                             }
                         }
                     }
@@ -550,5 +518,4 @@ fun SavedNewsEntry(
             }
         }
     }
-}
 }

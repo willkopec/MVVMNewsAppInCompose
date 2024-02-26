@@ -13,7 +13,9 @@ class MyPreference @Inject constructor(@ApplicationContext context : Context){
     fun isDarkMode(): Boolean {
         return prefs.getBoolean("darkMode", false)!!
     }
+
     fun switchDarkMode() {
         prefs.edit().putBoolean("darkMode", !isDarkMode()).apply()
     }
+
 }
