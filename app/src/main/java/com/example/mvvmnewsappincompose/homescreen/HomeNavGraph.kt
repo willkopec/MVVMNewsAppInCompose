@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.mvvmnewsappincompose.Graph
-import com.example.mvvmnewsappincompose.ScreenContent
 import com.example.mvvmnewsappincompose.breakingnews.BreakingNewsScreen
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.newsarticle.WebViewScreen
