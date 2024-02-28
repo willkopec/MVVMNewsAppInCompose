@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mvvmnewsappincompose.MyPreference
 import com.example.mvvmnewsappincompose.SortType
+import com.example.mvvmnewsappincompose.getAllTypes
 import com.example.mvvmnewsappincompose.models.Article
 import com.example.mvvmnewsappincompose.repository.NewsRepository
 import com.example.mvvmnewsappincompose.util.Resource
@@ -28,6 +29,8 @@ import java.util.Collections.addAll
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -35,30 +38,64 @@ import kotlinx.coroutines.launch
 class NewsViewModel
 @Inject
 constructor(
-    val newsRepository: NewsRepository,
-    val myPreference: MyPreference,
+    private val newsRepository: NewsRepository,
+    private val myPreference: MyPreference,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    var isLoading = mutableStateOf(true)
-    var loadError = mutableStateOf("")
-    var endReached = mutableStateOf(false)
-    var currentNews = mutableStateOf<List<Article>>(listOf())
-    var breakingNews = mutableStateOf<List<Article>>(listOf())
-    var economicNews = mutableStateOf<List<Article>>(listOf())
-    var sportsNews = mutableStateOf<List<Article>>(listOf())
-    var healthNews = mutableStateOf<List<Article>>(listOf())
-    var savedNews = mutableStateListOf<Article>()
-    var searchNews = mutableStateOf<List<Article>>(listOf())
-    var isSearching = mutableStateOf(false)
-    var darkTheme = mutableStateOf(myPreference.isDarkMode())
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    var breakingNewsPage = 1
-    var searchNewsPage = 1
+    private val _loadError = MutableStateFlow("")
+    val loadError: StateFlow<String> = _loadError
 
-    private var isSearchStarting = true
+    private val _endReached = MutableStateFlow(false)
+    val endReached: StateFlow<Boolean> = _endReached
 
-    var currentSortType = mutableStateOf(SortType.BREAKING)
+    private val _currentNews = MutableStateFlow<List<Article>>(emptyList())
+    val currentNews: StateFlow<List<Article>> = _currentNews
+
+    private val _breakingNews = MutableStateFlow<List<Article>>(emptyList())
+    val breakingNews: StateFlow<List<Article>> = _breakingNews
+
+    private val _economicNews = MutableStateFlow<List<Article>>(emptyList())
+    val economicNews: StateFlow<List<Article>> = _economicNews
+
+    private val _sportsNews = MutableStateFlow<List<Article>>(emptyList())
+    val sportsNews: StateFlow<List<Article>> = _sportsNews
+
+    private val _healthNews = MutableStateFlow<List<Article>>(emptyList())
+    val healthNews: StateFlow<List<Article>> = _healthNews
+
+    private val _savedNews = MutableStateFlow<List<Article>>(emptyList())
+    val savedNews: StateFlow<List<Article>> = _savedNews
+
+    private val _searchNews = MutableStateFlow<List<Article>>(emptyList())
+    val searchNews: StateFlow<List<Article>> = _searchNews
+
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching: StateFlow<Boolean> = _isSearching
+
+    private val _darkTheme = MutableStateFlow(myPreference.isDarkMode())
+    val darkTheme: StateFlow<Boolean> = _darkTheme
+
+    private var breakingNewsPage = 1
+    private var searchNewsPage = 1
+
+    private val _currentSortType = MutableStateFlow(SortType.BREAKING)
+    val currentSortType: StateFlow<SortType> = _currentSortType
+
+    // Function to update currentSortType
+    fun setCurrentSortType(sortType: SortType) {
+        _currentSortType.value = sortType
+    }
+
+    private val _scrollToTop = MutableLiveData(false)
+    val scrollToTop: LiveData<Boolean>
+        get() = _scrollToTop
+
+    private val _articleDeleted = MutableLiveData<Boolean>()
+    val articleDeleted: LiveData<Boolean> = _articleDeleted
 
     init {
         getAllNewsLists()
@@ -71,47 +108,33 @@ constructor(
         getSportsNews()
         getHealthNews()
 
-        if (loadError.value.isNotEmpty()) {
+        if (_loadError.value.isNotEmpty()) {
             breakingNewsPage = 1
         }
 
-        Log.d(
-            "GetAllNews Function",
-            "LoadError : ${loadError.value} Breaking news size: ${breakingNews.value.size}"
-        )
-
-        isLoading.value = loadError.value.isNotEmpty()
-        loadError.value = ""
+        _isLoading.value = _loadError.value.isNotEmpty()
+        _loadError.value = ""
         updateCurrentNews()
     }
 
     fun switchDarkMode() {
-        val newValue = !darkTheme.value
-        darkTheme.value = newValue
-        // Save the new value in SharedPreferences
+        val newValue = !_darkTheme.value
+        _darkTheme.value = newValue
         viewModelScope.launch { myPreference.switchDarkMode() }
     }
 
     fun updateCurrentNews() {
-        currentNews.value =
-            when (currentSortType.value) {
-                SortType.BREAKING -> breakingNews.value
-                SortType.ECONOMIC -> economicNews.value
-                SortType.SPORTS -> sportsNews.value
-                SortType.HEALTH -> healthNews.value
-            }
+        _currentNews.value = when (currentSortType.value) {
+            SortType.BREAKING -> _breakingNews.value
+            SortType.ECONOMIC -> _economicNews.value
+            SortType.SPORTS -> _sportsNews.value
+            SortType.HEALTH -> _healthNews.value
+        }
     }
-
-    private var _scrollToTop = MutableLiveData(false)
-    val scrollToTop: LiveData<Boolean>
-        get() = _scrollToTop
 
     fun updateScrollToTop(scroll: Boolean) {
         _scrollToTop.postValue(scroll)
     }
-
-    private val _articleDeleted = MutableLiveData<Boolean>()
-    val articleDeleted: LiveData<Boolean> = _articleDeleted
 
     fun updateArticleDeleted(deletion: Boolean) {
         _articleDeleted.postValue(deletion)
@@ -119,43 +142,34 @@ constructor(
 
     fun getBreakingNews(countryCode: String) {
         viewModelScope.launch {
-            isLoading.value = true
-            // var result = (PAGE_SIZE, curPage * PAGE_SIZE)
-            var result = newsRepository.getBreakingNews("us", breakingNewsPage)
-            // Log.d("GetBreakingNews Function", "getBreakingNews: ${breakingNewsPage} Breaking news
-            // size: ${breakingNews.value.size}")
+            _isLoading.value = true
+            val result = newsRepository.getBreakingNews("us", breakingNewsPage)
             when (result) {
                 is Resource.Success -> {
+                    val breakingNewsArticles = result.data?.articles?.map { article ->
+                        Article(
+                            article.author,
+                            article.content,
+                            article.description,
+                            article.publishedAt,
+                            article.source,
+                            article.title,
+                            article.url,
+                            article.urlToImage
+                        )
+                    } ?: emptyList()
 
-                    val breakingNewsArticles =
-                        result.data?.articles!!.mapIndexed { index, article ->
-                            Article(
-                                article.author,
-                                article.content,
-                                article.description,
-                                article.publishedAt,
-                                article.source,
-                                article.title,
-                                article.url,
-                                article.urlToImage
-                            )
-                        }
-
-                    Log.d(
-                        "GetBreakingNews Function",
-                        "getBreakingNews: ${breakingNewsPage} Breaking news size: ${result.data?.articles!!.size}"
-                    )
-                    loadError.value = ""
-                    isLoading.value = false
+                    _loadError.value = ""
+                    _isLoading.value = false
                     breakingNewsPage++
-                    breakingNews.value += breakingNewsArticles
-                    if (currentNews.value.isEmpty()) {
-                        currentNews.value += breakingNewsArticles
+                    _breakingNews.value += breakingNewsArticles
+                    if (_currentNews.value.isEmpty()) {
+                        _currentNews.value += breakingNewsArticles
                     }
                 }
                 is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
                 }
                 else -> {}
             }
@@ -164,34 +178,28 @@ constructor(
 
     fun getEconomicNews() {
         viewModelScope.launch {
-            isLoading.value = true
-            // var result = (PAGE_SIZE, curPage * PAGE_SIZE)
-            var result = newsRepository.getEconomicNews()
+            _isLoading.value = true
+            val result = newsRepository.getEconomicNews()
             when (result) {
                 is Resource.Success -> {
+                    val economicNewsArticles = result.data?.articles?.map { article ->
+                        Article(
+                            article.author,
+                            article.content,
+                            article.description,
+                            article.publishedAt,
+                            article.source,
+                            article.title,
+                            article.url,
+                            article.urlToImage
+                        )
+                    } ?: emptyList()
 
-                    val economicNewsArticles =
-                        result.data?.articles!!.mapIndexed { index, article ->
-                            Article(
-                                article.author,
-                                article.content,
-                                article.description,
-                                article.publishedAt,
-                                article.source,
-                                article.title,
-                                article.url,
-                                article.urlToImage
-                            )
-                        }
-
-                    // loadError.value = ""
-                    // isLoading.value = false
-                    // breakingNewsPage++
-                    economicNews.value += economicNewsArticles
+                    _economicNews.value += economicNewsArticles
                 }
                 is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
                 }
                 else -> {}
             }
@@ -200,34 +208,28 @@ constructor(
 
     fun getSportsNews() {
         viewModelScope.launch {
-            isLoading.value = true
-            // var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
-            var result = newsRepository.getSportsNews()
+            _isLoading.value = true
+            val result = newsRepository.getSportsNews()
             when (result) {
                 is Resource.Success -> {
+                    val sportsNewsArticles = result.data?.articles?.map { article ->
+                        Article(
+                            article.author,
+                            article.content,
+                            article.description,
+                            article.publishedAt,
+                            article.source,
+                            article.title,
+                            article.url,
+                            article.urlToImage
+                        )
+                    } ?: emptyList()
 
-                    val sportsNewsArticles =
-                        result.data?.articles!!.mapIndexed { index, article ->
-                            Article(
-                                article.author,
-                                article.content,
-                                article.description,
-                                article.publishedAt,
-                                article.source,
-                                article.title,
-                                article.url,
-                                article.urlToImage
-                            )
-                        }
-
-                    // breakingNewsPage++
-                    // loadError.value = ""
-                    // isLoading.value = false
-                    sportsNews.value += sportsNewsArticles
+                    _sportsNews.value += sportsNewsArticles
                 }
                 is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
                 }
                 else -> {}
             }
@@ -236,34 +238,28 @@ constructor(
 
     fun getHealthNews() {
         viewModelScope.launch {
-            isLoading.value = true
-            // var result = repository.getPokemonList(PAGE_SIZE, curPage * PAGE_SIZE)
-            var result = newsRepository.getHealthNews()
+            _isLoading.value = true
+            val result = newsRepository.getHealthNews()
             when (result) {
                 is Resource.Success -> {
+                    val healthNewsArticles = result.data?.articles?.map { article ->
+                        Article(
+                            article.author,
+                            article.content,
+                            article.description,
+                            article.publishedAt,
+                            article.source,
+                            article.title,
+                            article.url,
+                            article.urlToImage
+                        )
+                    } ?: emptyList()
 
-                    val healthNewsArticles =
-                        result.data?.articles!!.mapIndexed { index, article ->
-                            Article(
-                                article.author,
-                                article.content,
-                                article.description,
-                                article.publishedAt,
-                                article.source,
-                                article.title,
-                                article.url,
-                                article.urlToImage
-                            )
-                        }
-
-                    // loadError.value = ""
-                    // isLoading.value = false
-                    // breakingNewsPage++
-                    healthNews.value += healthNewsArticles
+                    _healthNews.value += healthNewsArticles
                 }
                 is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
                 }
                 else -> {}
             }
@@ -271,94 +267,58 @@ constructor(
     }
 
     fun searchNews(query: String) {
-
         viewModelScope.launch(Dispatchers.Default) {
             if (query.isEmpty() || query.length < 3) {
-                searchNews.value = emptyList()
-                isSearching.value = false
-                isSearchStarting = true
+                _searchNews.value = emptyList()
+                _isSearching.value = false
                 return@launch
             }
 
-            isLoading.value = true
-            searchNews.value = emptyList()
-            var result = newsRepository.searchNews(query, searchNewsPage)
+            _isLoading.value = true
+            _searchNews.value = emptyList()
+            val result = newsRepository.searchNews(query, searchNewsPage)
 
             when (result) {
                 is Resource.Success -> {
-                    isSearching.value = true
-                    endReached.value = searchNewsPage * 20 >= result.data!!.articles.size
-                    val searchNewsResults =
-                        result.data!!.articles.mapIndexed { index, entry ->
-                            Article(
-                                entry.author,
-                                entry.content,
-                                entry.description,
-                                entry.publishedAt,
-                                entry.source,
-                                entry.title,
-                                entry.url,
-                                entry.urlToImage
-                            )
-                        }
+                    _isSearching.value = true
+                    _endReached.value = searchNewsPage * 20 >= result.data?.articles?.size ?: 0
+                    val searchNewsResults = result.data?.articles?.map { entry ->
+                        Article(
+                            entry.author,
+                            entry.content,
+                            entry.description,
+                            entry.publishedAt,
+                            entry.source,
+                            entry.title,
+                            entry.url,
+                            entry.urlToImage
+                        )
+                    } ?: emptyList()
                     searchNewsPage++
 
-                    loadError.value = ""
-                    isLoading.value = false
-                    searchNews.value += searchNewsResults
+                    _loadError.value = ""
+                    _isLoading.value = false
+                    _searchNews.value += searchNewsResults
                 }
                 is Resource.Error -> {
-                    loadError.value = result.message!!
-                    isLoading.value = false
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
                 }
-                is Resource.Loading -> {}
                 else -> {}
             }
         }
     }
 
-    fun saveArticle(article: Article) =
+    fun saveArticle(article: Article) {
         viewModelScope.launch {
-            Log.d("Article Save:", "saveArticle: SAVED ARTICLE HERE")
             newsRepository.upsert(article)
         }
+    }
 
-    fun getSavedNews() =
+    fun getSavedNews() {
         newsRepository.getSavedNews().observeForever {
-            // currentNews.value = emptyList()
-            savedNews.clear()
-            savedNews.apply { addAll(it) }
-            // currentNews.value += it
+            _savedNews.value = it
         }
-
-    private fun hasInternetConnection(): Boolean {
-        /*val connectivityManager = getApplication()//getApplication.getSystemService(
-            Context.CONNECTIVITY_SERVICE
-        ) as ConnectivityManager*/
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return when {
-                capabilities.hasTransport(TRANSPORT_WIFI) -> true
-                capabilities.hasTransport(TRANSPORT_CELLULAR) -> true
-                capabilities.hasTransport(TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } else {
-            connectivityManager.activeNetworkInfo?.run {
-                return when (type) {
-                    TYPE_WIFI -> true
-                    TYPE_MOBILE -> true
-                    TYPE_ETHERNET -> true
-                    else -> false
-                }
-            }
-        }
-        return true
     }
 
     fun deleteArticle(article: Article) {
@@ -367,4 +327,5 @@ constructor(
             _articleDeleted.postValue(true)
         }
     }
+
 }

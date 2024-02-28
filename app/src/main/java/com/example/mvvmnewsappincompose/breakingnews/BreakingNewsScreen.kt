@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -81,14 +82,15 @@ fun BreakingNewsScreen(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    val currentSortType by remember { viewModel.currentSortType }
+    //val currentSortType by remember { viewModel.currentSortType }
+    val currentSortType by viewModel.currentSortType.collectAsState()
 
     Column {
         ChipGroup(
             chips = getAllTypes(),
             selectedType = currentSortType,
             onSelectedChanged = {
-                viewModel.currentSortType.value = getSortType(it)
+                viewModel.setCurrentSortType(getSortType(it))
                 viewModel.updateCurrentNews()
                 viewModel.updateScrollToTop(true)
             }
@@ -106,8 +108,10 @@ fun BreakingNewsListScreen(
 
     val scrollState = rememberLazyListState()
     val scrollToTop by viewModel.scrollToTop.observeAsState()
-    val currentNews by remember { viewModel.currentNews }
-    val loadError by remember { viewModel.loadError }
+    //val currentNews by remember { viewModel.currentNews }
+    //val loadError by remember { viewModel.loadError }
+    val currentNews by viewModel.currentNews.collectAsState()
+    val loadError by viewModel.loadError.collectAsState()
 
     LaunchedEffect(
         key1 = scrollToTop,
@@ -176,7 +180,9 @@ fun ChipGroup(
 
     Column(
         modifier =
-        Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primaryContainer)
+        Modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         LazyRow(modifier = Modifier) {
             items(chips) {
@@ -212,10 +218,11 @@ fun SavedNewsListScreen(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    val savedNews = remember { viewModel.savedNews }
+    //val savedNews = remember { viewModel.savedNews }
+    val savedNews = viewModel.savedNews.collectAsState()
 
     LazyColumn(/*contentPadding = PaddingValues(bottom = 100.dp)*/ ) {
-        val itemCount = savedNews.size
+        val itemCount = savedNews.value.size
 
         items(itemCount) {
             // no need to paginate as savedNews already contains all of the saved news from the
@@ -224,7 +231,7 @@ fun SavedNewsListScreen(
             SavedNewsEntry(
                 navController,
                 rowIndex = it,
-                entry = savedNews,
+                entry = savedNews.value,
                 modifier = Modifier,
                 snackbarHostState = snackbarHostState
             )
@@ -235,11 +242,17 @@ fun SavedNewsListScreen(
 @Composable
 fun SearchNewsResults(navController: NavController, viewModel: NewsViewModel = hiltViewModel()) {
 
-    val searchNews by remember { viewModel.searchNews }
+    /*val searchNews by remember { viewModel.searchNews }
     val isSearching by remember { viewModel.isSearching }
     val endReached by remember { viewModel.endReached }
     // val loadError by remember {  viewModel.loadError  }
-    val isLoading by remember { viewModel.isLoading }
+    val isLoading by remember { viewModel.isLoading }*/
+
+    val searchNews by viewModel.searchNews.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
+    val endReached by viewModel.endReached.collectAsState()
+    // val loadError by remember {  viewModel.loadError  }
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val itemCount = searchNews.size
 
@@ -287,7 +300,8 @@ fun NewsArticleEntry(
     Column {
         Box(
             modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .shadow(1.dp, RoundedCornerShape(1.dp))
                 /*.padding(13.dp)*/
                 .clickable {
@@ -303,7 +317,9 @@ fun NewsArticleEntry(
                     SubcomposeAsyncImage(
                         model = entry[rowIndex].urlToImage,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxHeight().clip(RoundedCornerShape(5.dp)),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(5.dp)),
                         // loading = { CircularProgressIndicator(modifier = Modifier.scale(0.5f)) }
                     )
                 }
@@ -312,9 +328,13 @@ fun NewsArticleEntry(
             val modifierForText: Modifier
 
             if (entry[rowIndex].urlToImage == null) {
-                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.Center)
+                modifierForText = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.Center)
             } else {
-                modifierForText = Modifier.fillMaxWidth(0.7f).align(Alignment.TopEnd)
+                modifierForText = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.TopEnd)
             }
 
             Row(modifier = modifierForText) {
@@ -427,7 +447,8 @@ fun SavedNewsEntry(
     Column {
         Box(
             modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .onSizeChanged { size = Size(it.width.toFloat(), it.height.toFloat()) }
                 .swipeable(
                     state = swipeableState,
@@ -442,7 +463,8 @@ fun SavedNewsEntry(
                 )
         ) {
             Box(
-                Modifier.offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                Modifier
+                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     .shadow(1.dp, RoundedCornerShape(1.dp))
                     .fillMaxWidth()
                     .clickable {
@@ -471,7 +493,10 @@ fun SavedNewsEntry(
                     modifierForText = Modifier.fillMaxWidth()
                 } else {
                     modifierForText =
-                        Modifier.fillMaxWidth().align(Alignment.TopEnd).padding(start = 150.dp)
+                        Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.TopEnd)
+                            .padding(start = 150.dp)
                 }
 
                 Row(modifier = modifierForText) {

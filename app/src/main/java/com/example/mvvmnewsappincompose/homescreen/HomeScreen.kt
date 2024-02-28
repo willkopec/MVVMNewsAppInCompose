@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,8 +77,10 @@ fun HomeScreen(
     viewModel: NewsViewModel = hiltViewModel()
 ) {
 
-    var darkTheme by remember { viewModel.darkTheme }
-    val loadError by remember { viewModel.loadError }
+    //var darkTheme by remember { viewModel.darkTheme }
+    //val loadError by remember { viewModel.loadError }
+    val darkTheme by viewModel.darkTheme.collectAsState()
+    val loadError by viewModel.loadError.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     MVVMNewsAppInComposeTheme(darkTheme = darkTheme) {
@@ -105,7 +108,8 @@ fun HomeScreen(
         ) { scaffoldPadding ->
             Box(
                 modifier =
-                Modifier.fillMaxSize()
+                Modifier
+                    .fillMaxSize()
                     .padding(scaffoldPadding)
                     .consumeWindowInsets(scaffoldPadding)
                     .systemBarsPadding(),
@@ -218,7 +222,8 @@ fun ThemeSwitcher(
 
     Box(
         modifier =
-        Modifier.width(size * 2)
+        Modifier
+            .width(size * 2)
             .height(size)
             .clip(shape = parentShape)
             .clickable { onClick() }
@@ -226,7 +231,8 @@ fun ThemeSwitcher(
     ) {
         Box(
             modifier =
-            Modifier.size(size)
+            Modifier
+                .size(size)
                 .offset(x = offset)
                 .padding(all = padding)
                 .clip(shape = toggleShape)
