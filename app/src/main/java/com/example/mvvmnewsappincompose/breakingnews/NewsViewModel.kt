@@ -1,6 +1,7 @@
 package com.example.mvvmnewsappincompose.breakingnews
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,20 +39,20 @@ constructor(
     private val _endReached = MutableStateFlow(false)
     val endReached: StateFlow<Boolean> = _endReached
 
-    private val _currentNews = MutableStateFlow<List<Article>>(emptyList())
-    val currentNews: StateFlow<List<Article>> = _currentNews
+    private val _breakingNews = mutableStateListOf<List<Article>>(listOf())
+    //val breakingNews: StateFlow<List<Article>> = _breakingNews
 
-    private val _breakingNews = MutableStateFlow<List<Article>>(emptyList())
-    val breakingNews: StateFlow<List<Article>> = _breakingNews
+    var currentNews = mutableStateListOf<List<Article>>(listOf())
+    //val currentNews: StateFlow<List<Article>> = _currentNews
 
-    private val _economicNews = MutableStateFlow<List<Article>>(emptyList())
-    val economicNews: StateFlow<List<Article>> = _economicNews
+    private val _economicNews = mutableStateListOf<List<Article>>(listOf())
+    //val economicNews: StateFlow<List<Article>> = _economicNews
 
-    private val _sportsNews = MutableStateFlow<List<Article>>(emptyList())
-    val sportsNews: StateFlow<List<Article>> = _sportsNews
+    private val _sportsNews = mutableStateListOf<List<Article>>(listOf())
+    //val sportsNews: StateFlow<List<Article>> = _sportsNews
 
-    private val _healthNews = MutableStateFlow<List<Article>>(emptyList())
-    val healthNews: StateFlow<List<Article>> = _healthNews
+    private val _healthNews = mutableStateListOf<List<Article>>(listOf())
+    //val healthNews: StateFlow<List<Article>> = _healthNews
 
     private val _savedNews = MutableStateFlow<List<Article>>(emptyList())
     val savedNews: StateFlow<List<Article>> = _savedNews
@@ -110,11 +111,11 @@ constructor(
     }
 
     fun updateCurrentNews() {
-        _currentNews.value = when (currentSortType.value) {
-            SortType.BREAKING -> _breakingNews.value
-            SortType.ECONOMIC -> _economicNews.value
-            SortType.SPORTS -> _sportsNews.value
-            SortType.HEALTH -> _healthNews.value
+        currentNews = when (currentSortType.value) {
+            SortType.BREAKING -> _breakingNews
+            SortType.ECONOMIC -> _economicNews
+            SortType.SPORTS -> _sportsNews
+            SortType.HEALTH -> _healthNews
         }
     }
 
@@ -148,9 +149,9 @@ constructor(
                     _loadError.value = ""
                     _isLoading.value = false
                     breakingNewsPage++
-                    _breakingNews.value += breakingNewsArticles
-                    if (_currentNews.value.isEmpty()) {
-                        _currentNews.value += breakingNewsArticles
+                    _breakingNews += breakingNewsArticles
+                    if (currentNews.isEmpty()) {
+                        currentNews += breakingNewsArticles
                     }
                 }
                 is Resource.Error -> {
@@ -181,7 +182,7 @@ constructor(
                         )
                     } ?: emptyList()
 
-                    _economicNews.value += economicNewsArticles
+                    _economicNews += economicNewsArticles
                 }
                 is Resource.Error -> {
                     _loadError.value = result.message ?: ""
@@ -211,7 +212,7 @@ constructor(
                         )
                     } ?: emptyList()
 
-                    _sportsNews.value += sportsNewsArticles
+                    _sportsNews += sportsNewsArticles
                 }
                 is Resource.Error -> {
                     _loadError.value = result.message ?: ""
@@ -241,7 +242,7 @@ constructor(
                         )
                     } ?: emptyList()
 
-                    _healthNews.value += healthNewsArticles
+                    _healthNews += healthNewsArticles
                 }
                 is Resource.Error -> {
                     _loadError.value = result.message ?: ""

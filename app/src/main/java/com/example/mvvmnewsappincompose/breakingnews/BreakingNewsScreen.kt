@@ -109,7 +109,8 @@ fun BreakingNewsListScreen(
     val scrollToTop by viewModel.scrollToTop.observeAsState()
     //val currentNews by remember { viewModel.currentNews }
     //val loadError by remember { viewModel.loadError }
-    val currentNews by viewModel.currentNews.collectAsState()
+    //val currentNews by viewModel.currentNews.collectAsState()
+    val currentNews = remember { viewModel.currentNews }
     val loadError by viewModel.loadError.collectAsState()
 
     LaunchedEffect(
