@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mvvmnewsappincompose"
+    namespace = "com.willkopec.mvvmnewsappincompose"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.mvvmnewsappincompose"
+        applicationId = "com.willkopec.mvvmnewsappincompose"
         minSdk = 25
         targetSdk = 34
         versionCode = 1
